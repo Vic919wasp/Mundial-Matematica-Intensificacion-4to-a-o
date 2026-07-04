@@ -1,0 +1,1508 @@
+<!-- ============================================================
+     CONTEXTO: Mundial Matemático — 4° Año (primera entrega)
+     Basado en el Diseño Curricular de Matemática de la DGCyE
+     (Provincia de Buenos Aires) para 4° año - Ciclo Superior.
+     4 ejes: Números y Operaciones · Álgebra y Estudio de
+     Funciones · Geometría y Magnitudes (Trigonometría) ·
+     Probabilidad y Estadística.
+     Reutiliza el motor del Mundial NTICx (búho, timer 10min,
+     música, equipos sin contraseña, tablero en vivo, logros,
+     compartir) + agrega Guías por eje y Panel Docente para
+     sumar/seleccionar contenido.
+     ============================================================
+     ÍNDICE DE NAVEGACIÓN
+     [001] HEAD / META                       - línea 22
+     [002] ESTILOS CSS                       - línea 29
+     [003] HTML — PANTALLAS                  - línea 330
+     [004] BANCO DE PREGUNTAS (4 ejes)       - línea 430
+     [004b] GUÍAS POR EJE (explicación)      - línea 490
+     [005] CONFIG BACKEND                    - línea 520
+     [006] EQUIPO / LOGIN SIMPLE             - línea 540
+     [007] MÚSICA "DESAFÍO"                  - línea 610
+     [008] QUIZ LOGIC + TIMER 10 MIN         - línea 670
+     [009] BÚHO SABIO (contexto x pregunta)  - línea 850
+     [010] RESULTADO + COMPARTIR             - línea 950
+     [011] RANKING LOGIC                     - línea 1080
+     [011b] PANEL DOCENTE: CONTENIDO         - línea 1150
+     [012] PRINT / PDF                       - línea 1260
+     [013] NAVEGACIÓN / INIT                 - línea 1330
+     ============================================================ -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- [001] HEAD -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>🏆 Mundial Matemático — 4° Año</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+
+<!-- [002] ESTILOS -->
+<style>
+:root{
+  --bg:#070c1f;--surface:#0d1638;--card:#121f4a;--card2:#1a2c5e;
+  --border:rgba(255,255,255,0.09);--text:#eaf0ff;--muted:#8ea0c9;
+  --c1:#6cace4;--c2:#ffd54a;--c3:#4ade80;--c4:#ffab2e;--c5:#ff5a7a;
+  --c1d:rgba(108,172,228,.14);--c2d:rgba(255,213,74,.14);
+  --c3d:rgba(74,222,128,.14);--c4d:rgba(255,171,46,.14);--c5d:rgba(255,90,122,.14);
+  --radius:14px;--fh:'Syne',sans-serif;--fb:'Nunito',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:
+  radial-gradient(circle at 15% 0%,rgba(108,172,228,.10),transparent 40%),
+  radial-gradient(circle at 85% 10%,rgba(255,213,74,.08),transparent 35%),
+  var(--bg);
+  color:var(--text);font-family:var(--fb);line-height:1.6;min-height:100vh}
+.screen{display:none}.screen.active{display:block}
+a{color:inherit}
+.sun-deco{position:fixed;top:-120px;right:-120px;width:280px;height:280px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,213,74,.18),transparent 70%);pointer-events:none;z-index:0}
+
+.user-topbar{background:var(--surface);border-bottom:2px solid var(--c1);padding:.6rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;position:relative;z-index:2}
+.user-info{display:flex;align-items:center;gap:.6rem;min-width:0}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--c1),var(--c2));display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:800;font-size:.9rem;color:#0a1128;flex-shrink:0}
+.user-name{font-family:var(--fh);font-weight:800;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40vw}
+.user-mail{font-size:.7rem;color:var(--muted)}
+.topbar-btns{display:flex;gap:.5rem;flex-wrap:wrap}
+.tb-btn{background:var(--card);border:1px solid var(--border);border-radius:99px;padding:.35rem .85rem;font-size:.75rem;font-weight:700;color:var(--text);cursor:pointer;font-family:var(--fh);transition:all .2s}
+.tb-btn:hover{background:var(--card2)}
+.tb-btn.ranking{color:var(--c4);border-color:rgba(255,171,46,.3)}
+.tb-btn.logout{color:var(--c5);border-color:rgba(255,90,122,.2)}
+.tb-btn.login-cta{color:var(--c1);border-color:rgba(108,172,228,.4)}
+
+.home-wrap{max-width:900px;margin:0 auto;padding:2rem 1rem 4rem;position:relative;z-index:1}
+.home-hero{text-align:center;padding:2rem 1rem 1.25rem}
+.trophy-big{font-size:3rem;animation:trophyFloat 3s ease-in-out infinite}
+@keyframes trophyFloat{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-8px) rotate(4deg)}}
+.home-hero h1{font-family:var(--fh);font-size:2.05rem;font-weight:800;letter-spacing:-.03em;margin:.4rem 0 .3rem}
+.home-hero h1 span{color:var(--c2)}
+.home-hero p{color:var(--muted);font-size:.92rem;max-width:560px;margin:0 auto 1.25rem}
+.rules-bar{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.75rem}
+.rule-chip{background:var(--card);border:1px solid var(--border);border-radius:99px;padding:.4rem .9rem;font-size:.76rem;color:var(--muted);display:flex;align-items:center;gap:.35rem}
+.rule-chip strong{color:var(--text)}
+.temas-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.9rem}
+.tema-card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:1.5rem 1rem;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.tema-card:hover{transform:translateY(-4px)}
+.tema-card .t-icon{font-size:2.1rem;margin-bottom:.5rem}
+.tema-card .t-label{font-family:var(--fh);font-size:1.1rem;font-weight:800;letter-spacing:-.02em}
+.tema-card .t-sub{font-size:.72rem;color:var(--muted);margin-top:.3rem}
+.tema-card .t-badge{position:absolute;top:.55rem;right:.55rem;font-size:.65rem;font-weight:800;padding:.2rem .5rem;border-radius:99px;text-transform:uppercase}
+.t0{border-color:rgba(108,172,228,.35)}.t0:hover{background:var(--c1d);border-color:var(--c1)}.t0 .t-label{color:var(--c1)}
+.t1{border-color:rgba(255,213,74,.35)}.t1:hover{background:var(--c2d);border-color:var(--c2)}.t1 .t-label{color:var(--c2)}
+.t2{border-color:rgba(74,222,128,.35)}.t2:hover{background:var(--c3d);border-color:var(--c3)}.t2 .t-label{color:var(--c3)}
+.t3{border-color:rgba(255,171,46,.35)}.t3:hover{background:var(--c4d);border-color:var(--c4)}.t3 .t-label{color:var(--c4)}
+.t5{border-color:rgba(255,213,74,.6);background:linear-gradient(160deg,rgba(255,213,74,.10),rgba(108,172,228,.08))}.t5:hover{border-color:var(--c2)}.t5 .t-label{color:var(--c2)}
+.jersey{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:6px;background:repeating-linear-gradient(180deg,#75AADB 0 6px,#fff 6px 12px);color:#0a1128;font-family:var(--fh);font-weight:800;font-size:.7rem;margin-bottom:.3rem}
+.mod-names-bar{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-bottom:1.5rem}
+.mod-chip{background:var(--card2);border:1px solid var(--border);border-radius:99px;padding:.3rem .8rem;font-size:.74rem;color:var(--muted)}
+.export-all-btn{background:linear-gradient(135deg,var(--c1),var(--c2));border:none;border-radius:99px;padding:.75rem 1.75rem;color:#0a1128;font-family:var(--fh);font-weight:800;font-size:.86rem;cursor:pointer;transition:opacity .2s;box-shadow:0 4px 24px rgba(108,172,228,.25)}
+.export-all-btn:hover{opacity:.88}
+.tema-card .btn-row{display:flex;gap:.4rem;justify-content:center;margin-top:.55rem;flex-wrap:wrap}
+.tema-card .mini-btn{font-size:.66rem;font-weight:700;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:99px;padding:.25rem .65rem;color:var(--muted);cursor:pointer;transition:all .2s;font-family:var(--fb)}
+.tema-card .mini-btn:hover{background:rgba(255,255,255,.14);color:var(--text)}
+
+/* ── QUIZ ── */
+.quiz-wrap{max-width:740px;margin:0 auto;padding:1.25rem 1rem 3rem;position:relative;z-index:1}
+.quiz-topbar{display:flex;align-items:center;gap:.7rem;margin-bottom:.9rem;flex-wrap:wrap}
+.back-btn{background:var(--card);border:1px solid var(--border);border-radius:9px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;flex-shrink:0}
+.back-btn:hover{background:var(--card2)}
+.quiz-title{font-family:var(--fh);font-weight:800;font-size:.93rem;flex:1;min-width:90px}
+.quiz-score-live{font-family:var(--fh);font-weight:800;font-size:.86rem;color:var(--c4)}
+.timer-chip{font-family:var(--fh);font-weight:800;font-size:.83rem;background:var(--card);border:1.5px solid var(--c1);border-radius:99px;padding:.25rem .7rem;display:flex;align-items:center;gap:.3rem;transition:all .3s}
+.timer-chip.warn{border-color:var(--c4);color:var(--c4)}
+.timer-chip.danger{border-color:var(--c5);color:var(--c5);animation:pulseWarn 1s infinite}
+@keyframes pulseWarn{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.music-btn{background:var(--card);border:1px solid var(--border);border-radius:99px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;flex-shrink:0}
+.music-btn.on{border-color:var(--c2);color:var(--c2)}
+.prog-bar{height:8px;background:var(--card);border-radius:99px;overflow:hidden;margin-bottom:.3rem}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--c1),var(--c2));border-radius:99px;transition:width .4s ease;width:0%}
+.prog-label{font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:.85rem}
+.streak-bar{display:flex;gap:.3rem;margin-bottom:.9rem;flex-wrap:wrap}
+.streak-dot{width:14px;height:14px;border-radius:50%;background:var(--card2);border:2px solid var(--border);transition:all .3s}
+.streak-dot.ok{background:var(--c3);border-color:var(--c3);box-shadow:0 0 6px rgba(74,222,128,.5)}
+.streak-dot.ko{background:var(--c5);border-color:var(--c5)}
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.65rem}
+.q-mod{font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.55rem;font-family:var(--fh)}
+.q-num-badge{display:inline-block;font-family:var(--fh);font-size:.68rem;font-weight:800;background:var(--card2);border-radius:99px;padding:.15rem .6rem;margin-bottom:.55rem;color:var(--muted)}
+.q-text{font-family:var(--fh);font-size:1.02rem;font-weight:700;line-height:1.5;margin-bottom:1.2rem}
+.opts{display:grid;gap:.55rem}
+.opt{display:block;width:100%;text-align:left;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:.72rem 1rem;color:#c8d3f0;font-family:var(--fb);font-size:.9rem;cursor:pointer;transition:all .18s}
+.opt:hover:not(:disabled){background:#22376e;border-color:rgba(255,255,255,.2)}
+.opt.correct{background:rgba(74,222,128,.15);border-color:#4ade80;color:#4ade80;font-weight:700}
+.opt.wrong{background:rgba(255,90,122,.12);border-color:#ff5a7a;color:#ff5a7a}
+.opt:disabled{cursor:default}
+.opt-letter{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.08);font-size:.72rem;font-weight:800;margin-right:.6rem;flex-shrink:0;font-family:var(--fh)}
+.feedback{margin-top:.85rem;font-size:.86rem;padding:.65rem .9rem;border-radius:8px;display:none;line-height:1.5}
+.feedback.show{display:block}
+.feedback.ok{background:rgba(74,222,128,.1);color:#4ade80}
+.feedback.ko{background:rgba(255,90,122,.1);color:#ff9ab0}
+.next-btn{margin-top:1rem;background:var(--c2);border:none;border-radius:99px;padding:.65rem 1.75rem;color:#0a1128;font-family:var(--fh);font-weight:800;font-size:.88rem;cursor:pointer}
+.next-btn:hover{opacity:.85}
+.combo-flash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--fh);font-size:2.6rem;font-weight:800;pointer-events:none;z-index:9000;animation:comboAnim .8s ease forwards;text-shadow:0 0 30px currentColor;text-align:center;width:90vw}
+@keyframes comboAnim{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}40%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-70%) scale(1)}}
+.buho-flotante-wrap{max-width:340px}
+
+/* ── RESULT ── */
+.result-wrap{max-width:700px;margin:0 auto;padding:1.75rem 1rem 4rem;position:relative;z-index:1}
+.result-card{background:var(--card);border:2px solid var(--c2);border-radius:var(--radius);padding:2.25rem 1.75rem;text-align:center;position:relative;overflow:hidden}
+.result-card.champion{border-color:var(--c2);box-shadow:0 0 60px rgba(255,213,74,.25)}
+.result-emoji{font-size:4.5rem;margin-bottom:.4rem;animation:bounceIn .6s ease}
+.result-title{font-family:var(--fh);font-size:1.65rem;font-weight:800;margin-bottom:.35rem;line-height:1.25}
+.score-display{margin:.4rem 0}
+.score-num{font-family:var(--fh);font-size:4.2rem;font-weight:800;letter-spacing:-.05em}
+.score-den{font-family:var(--fh);font-size:1.9rem;color:var(--muted)}
+.stars{font-size:2.1rem;margin:.4rem 0 1rem;letter-spacing:.15em}
+.result-msg{font-size:.95rem;color:#c8d3f0;margin-bottom:1.4rem}
+.breakdown{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:left;margin-bottom:1rem}
+.breakdown-title{font-family:var(--fh);font-size:.8rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.7rem}
+.brow{display:flex;align-items:center;gap:.75rem;padding:.4rem 0;border-top:1px solid var(--border);font-size:.85rem}
+.brow:first-of-type{border-top:none}
+.brow-name{flex:1;font-weight:600}
+.brow-score{font-family:var(--fh);font-weight:800;font-size:.86rem}
+.brow-bar-wrap{width:70px;background:var(--card);border-radius:99px;height:6px;overflow:hidden;flex-shrink:0}
+.brow-bar{height:100%;border-radius:99px;transition:width .6s ease}
+.review-box{background:rgba(255,171,46,.06);border:1px solid rgba(255,171,46,.2);border-radius:10px;padding:1rem;text-align:left;margin-bottom:1.2rem}
+.review-title{font-family:var(--fh);font-size:.8rem;font-weight:800;color:var(--c4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem}
+.review-item{font-size:.86rem;color:#c8d3f0;padding:.2rem 0}
+.review-item::before{content:"👉 ";color:var(--c4)}
+.best-row{display:flex;justify-content:center;gap:1.4rem;margin-bottom:1.4rem;flex-wrap:wrap}
+.best-chip{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:.6rem 1rem;font-size:.8rem;text-align:center}
+.best-chip strong{display:block;font-family:var(--fh);font-size:1.1rem;font-weight:800;color:var(--c2)}
+.result-btns{display:flex;gap:.65rem;justify-content:center;flex-wrap:wrap}
+.btn-retry{background:var(--c2);border:none;border-radius:99px;padding:.7rem 1.6rem;color:#0a1128;font-family:var(--fh);font-weight:800;font-size:.88rem;cursor:pointer}
+.btn-retry:hover{opacity:.85}
+.btn-home{background:var(--card2);border:1.5px solid var(--border);border-radius:99px;padding:.7rem 1.6rem;color:var(--text);font-family:var(--fh);font-weight:700;font-size:.88rem;cursor:pointer}
+.btn-home:hover{background:var(--card)}
+.share-box{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1.2rem}
+.share-title{font-family:var(--fh);font-size:.78rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.7rem}
+.share-btns{display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap}
+.share-btn{border:none;border-radius:99px;padding:.6rem 1.1rem;font-family:var(--fh);font-weight:800;font-size:.82rem;cursor:pointer;display:flex;align-items:center;gap:.4rem;text-decoration:none}
+.share-btn.wa{background:#25D366;color:#06210f}
+.share-btn.mail{background:var(--c1);color:#0a1128}
+.share-btn:hover{opacity:.88}
+
+/* ── MODALES (equipo / ranking / guía / docente-contenido) ── */
+.auth-overlay,.guia-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:8000;align-items:center;justify-content:center;padding:1.5rem;backdrop-filter:blur(8px)}
+.auth-overlay.open,.guia-overlay.open{display:flex}
+.auth-box{background:var(--card);border:2px solid var(--c1);border-radius:20px;padding:2.25rem 1.75rem;max-width:440px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.6);position:relative;max-height:90vh;overflow-y:auto}
+.auth-logo{font-size:2.6rem;text-align:center;margin-bottom:.6rem}
+.auth-title{font-family:var(--fh);font-size:1.4rem;font-weight:800;text-align:center;margin-bottom:.3rem}
+.auth-title span{color:var(--c2)}
+.auth-sub{font-size:.82rem;color:var(--muted);text-align:center;margin-bottom:1.5rem;line-height:1.5}
+.auth-tabs{display:flex;background:var(--card2);border-radius:99px;padding:.25rem;margin-bottom:1.4rem;gap:.25rem}
+.auth-tab{flex:1;text-align:center;padding:.45rem;border-radius:99px;font-family:var(--fh);font-size:.8rem;font-weight:700;cursor:pointer;color:var(--muted);transition:all .2s;border:none;background:none}
+.auth-tab.active{background:var(--c1);color:#0a1128}
+.auth-field{margin-bottom:.9rem}
+.auth-field label{display:block;font-size:.73rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.35rem;font-family:var(--fh)}
+.auth-field input,.auth-field textarea,.auth-field select{width:100%;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:.7rem 1rem;color:var(--text);font-family:var(--fb);font-size:.9rem;outline:none;transition:border-color .2s;resize:vertical}
+.auth-field input:focus,.auth-field textarea:focus{border-color:var(--c1)}
+.auth-hint{font-size:.7rem;color:var(--muted);margin-top:.3rem}
+.auth-btn{width:100%;background:linear-gradient(135deg,var(--c1),var(--c2));border:none;border-radius:99px;padding:.85rem;color:#0a1128;font-family:var(--fh);font-weight:800;font-size:.92rem;cursor:pointer;margin-top:.4rem;transition:opacity .2s}
+.auth-btn:hover{opacity:.88}
+.auth-btn:disabled{opacity:.5;cursor:not-allowed}
+.auth-msg{padding:.6rem .9rem;border-radius:8px;font-size:.82rem;margin-top:.75rem;display:none;line-height:1.5}
+.auth-msg.show{display:block}
+.auth-msg.error{background:rgba(255,90,122,.1);color:var(--c5);border:1px solid rgba(255,90,122,.25)}
+.auth-msg.success{background:rgba(74,222,128,.1);color:var(--c3);border:1px solid rgba(74,222,128,.25)}
+
+.guia-box{background:var(--card);border:2px solid var(--c1);border-radius:20px;padding:2rem 1.75rem;max-width:560px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.guia-box h2{font-family:var(--fh);font-size:1.3rem;font-weight:800;margin-bottom:.75rem}
+.guia-box h3{font-family:var(--fh);font-size:.9rem;font-weight:800;color:var(--c2);margin:1.1rem 0 .5rem}
+.guia-box p,.guia-box li{font-size:.88rem;color:#c8d3f0;line-height:1.6}
+.guia-box ul{padding-left:1.2rem;margin-bottom:.5rem}
+.guia-ejemplo{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:.9rem 1rem;margin:.6rem 0;font-size:.86rem}
+.guia-close{width:100%;background:var(--card2);border:1.5px solid var(--border);border-radius:99px;padding:.65rem;color:var(--text);font-family:var(--fh);font-weight:700;font-size:.86rem;cursor:pointer;margin-top:1rem}
+
+.ranking-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:5000;overflow-y:auto;padding:2rem 1rem;backdrop-filter:blur(6px)}
+.ranking-overlay.open{display:block}
+.ranking-modal{background:var(--card);border:1px solid var(--border);border-radius:20px;max-width:760px;margin:0 auto;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.ranking-header{background:linear-gradient(135deg,rgba(108,172,228,.2),rgba(255,213,74,.15));border-bottom:1px solid var(--border);padding:1.5rem 1.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.ranking-header h2{font-family:var(--fh);font-size:1.1rem;font-weight:800}
+.ranking-tabs{display:flex;gap:.5rem;flex-wrap:wrap}
+.rtab{background:var(--card2);border:1px solid var(--border);border-radius:99px;padding:.35rem .9rem;font-size:.72rem;font-weight:700;color:var(--muted);cursor:pointer;font-family:var(--fh);transition:all .2s}
+.rtab.active{background:var(--c2);color:#0a1128;border-color:var(--c2)}
+.ranking-close{background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:99px;padding:.35rem .85rem;font-size:.74rem;font-weight:700;color:var(--text);cursor:pointer;font-family:var(--fh)}
+.ranking-body{padding:1.5rem}
+.top10-list{display:flex;flex-direction:column;gap:.6rem}
+.top10-item{display:flex;align-items:center;gap:.9rem;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:.8rem 1rem}
+.top10-item.me{border-color:rgba(255,213,74,.4);background:rgba(255,213,74,.06)}
+.top10-pos{font-family:var(--fh);font-weight:800;font-size:1.1rem;width:28px;text-align:center;flex-shrink:0}
+.top10-pos.gold{color:#ffd700}.top10-pos.silver{color:#c0c0c0}.top10-pos.bronze{color:#cd7f32}
+.top10-name{flex:1;font-weight:700;font-size:.88rem}
+.top10-sub{font-size:.71rem;color:var(--muted);margin-top:.1rem}
+.top10-pts{font-family:var(--fh);font-weight:800;font-size:1rem;color:var(--c2)}
+.ranking-empty{text-align:center;padding:2.5rem;color:var(--muted);font-size:.9rem}
+.rk-spinner{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--c2);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:.75rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ranking-loading{text-align:center;padding:2rem;color:var(--muted)}
+.doc-pass-wrap{display:flex;gap:.6rem;margin-bottom:1rem}
+.doc-pass-wrap input{flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:.6rem .9rem;color:var(--text);font-family:var(--fb);font-size:.86rem;outline:none}
+.doc-pass-wrap button{background:var(--c1);border:none;border-radius:10px;padding:.6rem 1.1rem;color:#0a1128;font-family:var(--fh);font-weight:700;font-size:.8rem;cursor:pointer}
+.doc-stat-row{display:flex;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap}
+.doc-stat{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:.75rem 1rem;flex:1;min-width:100px;text-align:center}
+.doc-stat strong{display:block;font-family:var(--fh);font-size:1.3rem;font-weight:800;color:var(--c2)}
+.doc-stat span{font-size:.7rem;color:var(--muted)}
+.doc-table-wrap{overflow-x:auto;margin-top:.5rem}
+.doc-table{width:100%;border-collapse:collapse;font-size:.78rem}
+.doc-table th{background:var(--card2);color:var(--muted);font-family:var(--fh);font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;padding:.6rem .75rem;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+.doc-table td{padding:.55rem .75rem;border-bottom:1px solid var(--border);color:var(--text)}
+
+/* Panel docente: ejes activos + agregar preguntas */
+.eje-toggle-row{display:flex;align-items:center;justify-content:space-between;gap:.6rem;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:.7rem .9rem;margin-bottom:.5rem}
+.eje-toggle-row label{font-size:.85rem;font-weight:700}
+.switch{position:relative;display:inline-block;width:42px;height:24px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;inset:0;background:var(--border);border-radius:99px;transition:.2s}
+.slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
+input:checked+.slider{background:var(--c3)}
+input:checked+.slider::before{transform:translateX(18px)}
+.custom-q-list{max-height:220px;overflow-y:auto;margin-top:.8rem}
+.custom-q-item{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:.6rem .75rem;margin-bottom:.5rem;font-size:.8rem;display:flex;justify-content:space-between;gap:.5rem;align-items:flex-start}
+.custom-q-item button{background:rgba(255,90,122,.15);border:1px solid rgba(255,90,122,.3);color:var(--c5);border-radius:99px;padding:.2rem .6rem;font-size:.7rem;cursor:pointer;flex-shrink:0}
+.docente-section{margin-bottom:1.5rem}
+.docente-section h3{font-family:var(--fh);font-size:.82rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.7rem}
+
+.print-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:10000;overflow-y:auto;padding:2rem 1rem;backdrop-filter:blur(4px)}
+.print-overlay.open{display:block}
+.print-modal{background:#fff;color:#111;max-width:720px;margin:0 auto;border-radius:12px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.5)}
+.print-modal-header{background:#0a1128;color:#fff;padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.print-modal-title{font-family:var(--fh);font-size:1.05rem;font-weight:800}
+.print-modal-actions{display:flex;gap:.6rem;flex-shrink:0}
+.pm-btn{border:none;border-radius:99px;padding:.5rem 1.1rem;font-family:var(--fh);font-weight:700;font-size:.8rem;cursor:pointer}
+.pm-btn-print{background:var(--c2);color:#0a1128}
+.pm-btn-close{background:rgba(255,255,255,.12);color:#fff}
+.print-modal-body{padding:1.5rem}
+.pc-header{text-align:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid #e0e0e0}
+.pc-header h2{font-family:var(--fh);font-size:1.3rem;font-weight:800;color:#0a1128;margin-bottom:.25rem}
+.pc-header p{font-size:.8rem;color:#666}
+.pc-meta{display:flex;justify-content:center;gap:1.5rem;margin-top:.75rem;flex-wrap:wrap}
+.pc-meta span{font-size:.74rem;color:#888}
+.pc-q{margin-bottom:1rem;page-break-inside:avoid}
+.pc-q-text{font-family:var(--fh);font-size:.88rem;font-weight:700;color:#0a1128;margin-bottom:.45rem;line-height:1.45}
+.pc-q-num{color:#999;font-weight:600;margin-right:.3rem;font-size:.83rem}
+.pc-opts{display:grid;grid-template-columns:1fr 1fr;gap:.25rem .75rem}
+.pc-opt{font-size:.78rem;color:#333;display:flex;align-items:flex-start;gap:.4rem;line-height:1.35}
+.pc-opt-letter{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1.5px solid #ccc;font-size:.6rem;font-weight:800;flex-shrink:0;margin-top:1px;color:#666}
+.pc-answer-key{margin-top:1.5rem;padding-top:1rem;border-top:2px dashed #ddd}
+.pc-answer-key h3{font-family:var(--fh);font-size:.8rem;font-weight:800;color:#0a1128;margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.05em}
+.pc-answers-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:.4rem}
+.pc-ans-item{background:#f4f4f8;border-radius:6px;padding:.35rem .4rem;text-align:center}
+.pc-ans-item .an{font-weight:800;color:#0a1128;font-family:var(--fh);font-size:.68rem}
+.pc-ans-item .av{color:#444;font-size:.63rem;margin-top:.1rem}
+.pc-footer{margin-top:1rem;text-align:center;font-size:.68rem;color:#aaa}
+
+.confetti-piece{position:absolute;top:-20px;animation:confettiFall linear forwards}
+@keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}90%{opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+@keyframes bounceIn{0%{transform:scale(0)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
+#confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden}
+@keyframes slideUpBuho{from{transform:translateY(80px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes buhoEntrada{from{transform:translateY(60px) scale(.8);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+@keyframes buhoFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-6px) rotate(3deg)}}
+@keyframes slideInCard{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:600px){
+  .home-hero h1{font-size:1.5rem}
+  .temas-grid{grid-template-columns:1fr 1fr}
+  .tema-card{padding:1rem .65rem}
+  .score-num{font-size:3.3rem}
+  .result-card{padding:1.5rem 1rem}
+  .auth-box,.guia-box{padding:1.5rem 1.1rem}
+  .ranking-tabs{flex-wrap:wrap}
+  .quiz-title{font-size:.82rem}
+  .user-name{max-width:32vw}
+  .buho-flotante-wrap{max-width:calc(100vw - 2rem)}
+  .share-btns{flex-direction:column}
+  .share-btn{justify-content:center}
+  .pc-answers-grid{grid-template-columns:repeat(4,1fr)}
+}
+@media(max-width:380px){
+  .rules-bar .rule-chip{font-size:.66rem;padding:.3rem .6rem}
+  .doc-stat{min-width:78px}
+}
+@media print{
+  body>*:not(.print-overlay){display:none !important}
+  .print-overlay{display:block !important;position:static !important;background:none !important;padding:0 !important;backdrop-filter:none !important}
+  .print-modal{box-shadow:none !important;border-radius:0 !important;max-width:100% !important}
+  .print-modal-header{display:none !important}
+  .print-modal-body{padding:.5cm !important}
+  .pc-q{page-break-inside:avoid;break-inside:avoid}
+  .pc-tema-block{display:block;page-break-after:always !important;break-after:page !important}
+  .pc-tema-block:last-child{page-break-after:auto !important;break-after:auto !important}
+}
+</style>
+</head>
+<body>
+
+<!-- [003] HTML — PANTALLAS -->
+<div class="sun-deco"></div>
+<div id="confetti-container"></div>
+
+<div class="user-topbar" id="user-topbar">
+  <div class="user-info">
+    <div class="user-avatar" id="user-avatar">📐</div>
+    <div>
+      <div class="user-name" id="user-name-display">Sin equipo</div>
+      <div class="user-mail" id="user-mail-display">Anotate para guardar tus goles</div>
+    </div>
+  </div>
+  <div class="topbar-btns" id="topbar-btns">
+    <button class="tb-btn ranking" onclick="openRanking()">🏆 Tabla de posiciones</button>
+    <button class="tb-btn login-cta" id="btn-login-cta" onclick="openAuth()">⚽ Anotar mi equipo</button>
+  </div>
+</div>
+
+<div id="screen-home" class="screen active">
+  <div class="home-wrap">
+    <div class="home-hero">
+      <div class="trophy-big">🏆</div>
+      <h1>Mundial <span>Matemático</span> — 4° Año</h1>
+      <p>Actividad de <strong>intensificación</strong> basada en el Diseño Curricular de Matemática de 4° año (DGCyE). Mirá la guía, practicá los ejercicios y después jugá el partido. ⚽📐</p>
+      <div class="rules-bar">
+        <div class="rule-chip">📋 <strong>4 ejes + Final</strong></div>
+        <div class="rule-chip">⏱️ <strong>10 min máx.</strong> por partido</div>
+        <div class="rule-chip">🦉 <strong>Ayuda del Búho</strong> en cada pregunta</div>
+        <div class="rule-chip">📖 <strong>Guía + ejercicios</strong> por eje</div>
+      </div>
+    </div>
+    <div class="mod-names-bar" id="mod-names-bar"></div>
+    <div class="temas-grid" id="temas-grid"></div>
+    <div style="text-align:center;margin-top:1.75rem">
+      <button class="export-all-btn" onclick="openPrintAll()">🖨️ Exportar todos los ejes a PDF</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-quiz" class="screen">
+  <div class="quiz-wrap">
+    <div class="quiz-topbar">
+      <div class="back-btn" onclick="goHome()">←</div>
+      <div class="quiz-title" id="quiz-title">Eje</div>
+      <div class="timer-chip" id="timer-chip">⏱️ 10:00</div>
+      <button class="music-btn" id="music-btn" onclick="toggleMusic()" title="Música">🔊</button>
+      <div class="quiz-score-live" id="quiz-score-live">0 pts</div>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+    <div class="prog-label" id="prog-label">Pregunta 1 de 10</div>
+    <div class="streak-bar" id="streak-bar"></div>
+    <div id="q-container"></div>
+  </div>
+</div>
+
+<div id="screen-result" class="screen">
+  <div class="result-wrap">
+    <div class="result-card" id="result-card"></div>
+  </div>
+</div>
+
+<!-- EQUIPO MODAL -->
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-box">
+    <div class="auth-logo">⚽📐</div>
+    <div class="auth-title">Anotá tu <span>Selección</span></div>
+    <div class="auth-sub" id="auth-sub">Sin contraseña, sin vueltas. Poné tu nombre (o el de tu equipo) y arrancamos.</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-ind" onclick="switchAuthTab('individual')">🙋 Individual</button>
+      <button class="auth-tab" id="tab-equipo" onclick="switchAuthTab('equipo')">👥 Equipo</button>
+    </div>
+    <div id="form-individual">
+      <div class="auth-field"><label>Nombre y apellido</label><input type="text" id="ind-nombre" placeholder="Ej: Lionel Messi"></div>
+    </div>
+    <div id="form-equipo" style="display:none">
+      <div class="auth-field"><label>Nombre del equipo</label><input type="text" id="eq-nombre" placeholder="Ej: Los Albicelestes"></div>
+      <div class="auth-field">
+        <label>Integrantes (nombre y apellido)</label>
+        <textarea id="eq-integrantes" rows="3" placeholder="Un integrante por línea:&#10;Ana Pérez&#10;Juan Gómez"></textarea>
+        <div class="auth-hint">Escribí nombre y apellido de cada integrante, uno por renglón.</div>
+      </div>
+    </div>
+    <button class="auth-btn" id="btn-start" onclick="doStartTeam()">⚽ ¡A jugar! →</button>
+    <div class="auth-msg" id="auth-msg"></div>
+    <span id="auth-skip-mid" onclick="skipMidReminder()" style="display:none;text-align:center;margin-top:.9rem;font-size:.76rem;color:var(--muted);cursor:pointer;text-decoration:underline">Después — seguir jugando sin anotarme</span>
+  </div>
+</div>
+
+<!-- GUÍA MODAL -->
+<div class="guia-overlay" id="guia-overlay" onclick="if(event.target===this)closeGuia()">
+  <div class="guia-box" id="guia-box"></div>
+</div>
+
+<!-- RANKING / DOCENTE MODAL -->
+<div class="ranking-overlay" id="ranking-overlay" onclick="if(event.target===this)closeRanking()">
+  <div class="ranking-modal">
+    <div class="ranking-header">
+      <h2>🏆 Tabla — Mundial Matemático</h2>
+      <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap">
+        <div class="ranking-tabs">
+          <button class="rtab active" id="tab-top10" onclick="switchRankTab('top10')">🥇 Top 10</button>
+          <button class="rtab" id="tab-docente" onclick="switchRankTab('docente')">👩‍🏫 Docente</button>
+          <button class="rtab" id="tab-contenido" onclick="switchRankTab('contenido')">📚 Contenido</button>
+        </div>
+        <button class="ranking-close" onclick="closeRanking()">✕ Cerrar</button>
+      </div>
+    </div>
+    <div class="ranking-body">
+      <div id="tab-top10-content"></div>
+      <div id="tab-docente-content" style="display:none"></div>
+      <div id="tab-contenido-content" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<div class="print-overlay" id="print-overlay" onclick="if(event.target===this)closePrint()">
+  <div class="print-modal">
+    <div class="print-modal-header">
+      <div class="print-modal-title" id="pm-title">Vista previa</div>
+      <div class="print-modal-actions">
+        <button class="pm-btn pm-btn-print" onclick="window.print()">🖨️ Imprimir / PDF</button>
+        <button class="pm-btn pm-btn-close" onclick="closePrint()">✕</button>
+      </div>
+    </div>
+    <div class="print-modal-body" id="pm-body"></div>
+  </div>
+</div>
+
+<!-- [004] BANCO DE PREGUNTAS — 4° Año, basado en Diseño Curricular DGCyE -->
+<script>
+const MODS={
+  m1:'🔢 Números y Operaciones',
+  m2:'📈 Álgebra y Funciones',
+  m3:'📐 Geometría (Trigonometría)',
+  m4:'🎲 Probabilidad y Estadística'
+};
+
+const BANK_BUILTIN=[
+// ── m1: NÚMEROS Y OPERACIONES ────────────────────────────────
+{mod:'m1',hint:'💡 Los reales incluyen a los racionales (se pueden escribir como fracción) y a los irracionales (no).',q:'¿Cuál de estos números NO es racional?',opts:['3/4','√2','0,75','-5'],ans:1},
+{mod:'m1',hint:'💡 Un número racional se puede escribir como fracción de dos enteros. π y √2 no se pueden.',q:'¿Qué caracteriza a un número irracional?',opts:['Que es negativo','Que no se puede expresar como fracción de dos enteros','Que es siempre mayor que 1','Que no tiene decimales'],ans:1},
+{mod:'m1',hint:'💡 Recordá la propiedad: raíz de un producto es producto de raíces (si los índices son iguales).',q:'¿Cuál es el resultado de √8 · √2?',opts:['√16 = 4','√10','16','2√2'],ans:0},
+{mod:'m1',hint:'💡 Para sumar o restar radicales, deben tener el mismo índice y el mismo radicando.',q:'¿Cuándo se pueden sumar dos radicales directamente?',opts:['Siempre que ambos sean números positivos','Cuando tienen el mismo índice y el mismo radicando','Cuando ambos son racionales','Nunca se pueden sumar'],ans:1},
+{mod:'m1',hint:'💡 La notación científica se escribe como a × 10ⁿ, con 1 ≤ a < 10.',q:'¿Cuál es la notación científica de 45.000?',opts:['45 × 10³','4,5 × 10⁴','0,45 × 10⁵','4,5 × 10³'],ans:1},
+{mod:'m1',hint:'💡 Una potencia con exponente negativo equivale al inverso de la base elevada al exponente positivo.',q:'¿A qué es igual 2⁻³?',opts:['-8','1/8','8','-1/8'],ans:1},
+{mod:'m1',hint:'💡 Elevar una potencia a otra potencia: se multiplican los exponentes.',q:'¿Cuál es el resultado de (2³)²?',opts:['2⁵','2⁶','2⁹','2¹'],ans:1},
+{mod:'m1',hint:'💡 Todo número real, racional o irracional, tiene un lugar único en la recta numérica.',q:'¿En qué se diferencia principalmente el conjunto de los números reales R de los racionales Q?',opts:['R incluye además a los irracionales, como √2 o π','R solo contiene números negativos','Q incluye a R','No hay diferencia, son el mismo conjunto'],ans:0},
+{mod:'m1',hint:'💡 Para racionalizar un denominador con raíz cuadrada, se multiplica arriba y abajo por esa misma raíz.',q:'¿Para qué sirve racionalizar el denominador de una fracción con radicales?',opts:['Para que el numerador sea negativo','Para eliminar la raíz del denominador y simplificar la expresión','Para que el resultado sea siempre un número entero','No tiene ninguna utilidad práctica'],ans:1},
+{mod:'m1',hint:'💡 Todo número elevado a exponente 0 (distinto de 0) da como resultado 1.',q:'¿Cuánto vale 5⁰?',opts:['0','1','5','Indefinido'],ans:1},
+{mod:'m1',hint:'💡 La raíz cuadrada de un número negativo no tiene solución dentro de los números reales.',q:'¿Por qué √-4 no tiene solución en los números reales?',opts:['Porque -4 es muy chico','Porque ningún número real elevado al cuadrado da un resultado negativo','Porque 4 no es un cuadrado perfecto','Porque las raíces cuadradas siempre son positivas'],ans:1},
+{mod:'m1',hint:'💡 Multiplicar potencias de igual base: se suman los exponentes.',q:'¿Cuál es el resultado de 3² · 3⁴?',opts:['3⁶','3⁸','9⁶','3²'],ans:0},
+// ── m2: ÁLGEBRA Y ESTUDIO DE FUNCIONES ───────────────────────
+{mod:'m2',hint:'💡 En y = mx + b, "m" indica la inclinación de la recta y "b" dónde corta al eje y.',q:'En la función lineal y = mx + b, ¿qué representa "m"?',opts:['La ordenada al origen','La pendiente de la recta','El punto donde corta al eje x','El vértice de la recta'],ans:1},
+{mod:'m2',hint:'💡 La ordenada al origen es el valor de "y" cuando x = 0, es decir, dónde la recta cruza ese eje.',q:'En y = mx + b, ¿qué representa "b"?',opts:['La pendiente','El punto donde la recta corta al eje y (x=0)','El coeficiente cuadrático','La raíz de la función'],ans:1},
+{mod:'m2',hint:'💡 Si la pendiente es positiva, la recta sube de izquierda a derecha (crece); si es negativa, baja.',q:'Si la pendiente "m" de una función lineal es negativa, la función es…',opts:['Creciente','Constante','Decreciente','No se puede saber'],ans:2},
+{mod:'m2',hint:'💡 Dos rectas son paralelas cuando tienen exactamente la misma pendiente.',q:'¿Cuándo dos rectas son paralelas?',opts:['Cuando tienen distinta ordenada al origen','Cuando tienen la misma pendiente','Cuando se cortan en un punto','Cuando ambas pasan por el origen'],ans:1},
+{mod:'m2',hint:'💡 Dos rectas son perpendiculares cuando el producto de sus pendientes da -1.',q:'¿Cuándo dos rectas son perpendiculares?',opts:['Cuando tienen la misma pendiente','Cuando el producto de sus pendientes es igual a -1','Cuando ambas tienen pendiente 0','Cuando no se cortan nunca'],ans:1},
+{mod:'m2',hint:'💡 La gráfica de una función cuadrática siempre es una parábola.',q:'¿Qué tipo de gráfica tiene una función cuadrática f(x) = ax² + bx + c?',opts:['Una recta','Una parábola','Una circunferencia','Una hipérbola'],ans:1},
+{mod:'m2',hint:'💡 La parábola es simétrica respecto de una recta vertical que pasa justo por su punto más alto o más bajo.',q:'¿Qué es el eje de simetría de una parábola?',opts:['La recta vertical que pasa por el vértice y divide a la parábola en dos mitades iguales','El punto más alto de la parábola','La intersección con el eje x','El coeficiente principal de la función'],ans:0},
+{mod:'m2',hint:'💡 Es el punto más bajo (si la parábola abre hacia arriba) o más alto (si abre hacia abajo).',q:'¿Qué es el vértice de una parábola?',opts:['El punto donde la parábola corta al eje x','El punto máximo o mínimo de la función cuadrática','La pendiente de la función','El coeficiente independiente'],ans:1},
+{mod:'m2',hint:'💡 Es la fórmula que permite calcular las raíces de cualquier ecuación cuadrática ax²+bx+c=0.',q:'¿Para qué se usa la fórmula resolvente en una función cuadrática?',opts:['Para calcular la pendiente','Para encontrar las raíces (ceros) de la función cuadrática','Para calcular el dominio de la función','Para graficar una recta'],ans:1},
+{mod:'m2',hint:'💡 Si el coeficiente principal "a" es positivo, la parábola abre hacia arriba (tiene un mínimo).',q:'Si en f(x) = ax² + bx + c el coeficiente "a" es positivo, la parábola…',opts:['Abre hacia abajo y tiene un máximo','Abre hacia arriba y tiene un mínimo','Es una recta','No tiene vértice'],ans:1},
+{mod:'m2',hint:'💡 La Regla de Ruffini permite dividir un polinomio por (x - a) de forma rápida.',q:'¿Para qué se utiliza la Regla de Ruffini?',opts:['Para sumar dos polinomios','Para dividir un polinomio por un binomio de la forma (x - a)','Para graficar funciones lineales','Para calcular la pendiente de una recta'],ans:1},
+{mod:'m2',hint:'💡 El Teorema del Resto dice que el resto de dividir P(x) por (x-a) es igual a P(a).',q:'Según el Teorema del Resto, ¿cómo se calcula el resto de dividir un polinomio P(x) por (x-a)?',opts:['Sumando todos los coeficientes de P(x)','Evaluando P(x) en x=a, es decir, calculando P(a)','Dividiendo el grado de P(x) por a','Multiplicando P(x) por a'],ans:1},
+{mod:'m2',hint:'💡 El Teorema de Gauss ayuda a encontrar las posibles raíces racionales de un polinomio con coeficientes enteros.',q:'¿Para qué sirve el Teorema de Gauss en el estudio de polinomios?',opts:['Para graficar la función directamente','Para hallar posibles raíces racionales de un polinomio con coeficientes enteros','Para sumar dos funciones cuadráticas','Para calcular el vértice de una parábola'],ans:1},
+{mod:'m2',hint:'💡 Una raíz de multiplicidad 2 significa que ese factor (x-a) aparece dos veces en la factorización.',q:'¿Qué significa que una raíz de un polinomio tenga "multiplicidad 2"?',opts:['Que la raíz vale 2','Que el factor correspondiente a esa raíz se repite dos veces en la factorización','Que hay dos raíces distintas','Que el polinomio tiene grado 2'],ans:1},
+// ── m3: GEOMETRÍA Y MAGNITUDES (TRIGONOMETRÍA) ───────────────
+{mod:'m3',hint:'💡 En un triángulo rectángulo, seno = cateto opuesto sobre hipotenusa.',q:'En un triángulo rectángulo, ¿cómo se calcula el seno de un ángulo agudo?',opts:['Cateto opuesto sobre hipotenusa','Cateto adyacente sobre hipotenusa','Cateto opuesto sobre cateto adyacente','Hipotenusa sobre cateto opuesto'],ans:0},
+{mod:'m3',hint:'💡 Coseno = cateto adyacente sobre hipotenusa.',q:'En un triángulo rectángulo, ¿cómo se calcula el coseno de un ángulo agudo?',opts:['Cateto opuesto sobre hipotenusa','Cateto adyacente sobre hipotenusa','Cateto opuesto sobre cateto adyacente','Hipotenusa sobre cateto adyacente'],ans:1},
+{mod:'m3',hint:'💡 Tangente = cateto opuesto sobre cateto adyacente (también seno sobre coseno).',q:'¿Cómo se calcula la tangente de un ángulo agudo en un triángulo rectángulo?',opts:['Cateto opuesto sobre hipotenusa','Cateto adyacente sobre hipotenusa','Cateto opuesto sobre cateto adyacente','Hipotenusa sobre cateto opuesto'],ans:2},
+{mod:'m3',hint:'💡 El Teorema de Pitágoras relaciona los tres lados de un triángulo rectángulo: a² + b² = c².',q:'¿Qué establece el Teorema de Pitágoras?',opts:['La suma de los ángulos internos es 180°','En un triángulo rectángulo, la suma de los cuadrados de los catetos es igual al cuadrado de la hipotenusa','El área de un triángulo es base por altura sobre dos','Todos los triángulos son semejantes'],ans:1},
+{mod:'m3',hint:'💡 Dos triángulos son semejantes si tienen la misma forma (ángulos iguales) aunque sean de distinto tamaño.',q:'¿Cuándo dos triángulos son semejantes?',opts:['Cuando tienen exactamente el mismo tamaño','Cuando tienen sus ángulos correspondientes iguales y sus lados proporcionales','Cuando son ambos rectángulos','Cuando tienen la misma área'],ans:1},
+{mod:'m3',hint:'💡 El Teorema del Seno se usa en triángulos que no son rectángulos, relacionando lados y ángulos opuestos.',q:'¿Para qué se usa el Teorema del Seno?',opts:['Solo para triángulos rectángulos','Para resolver triángulos oblicuángulos (no rectángulos), relacionando lados y ángulos opuestos','Para calcular áreas de círculos','Para sumar ángulos internos'],ans:1},
+{mod:'m3',hint:'💡 El Teorema del Coseno generaliza el Teorema de Pitágoras para cualquier triángulo.',q:'¿Qué relación generaliza el Teorema del Coseno?',opts:['El Teorema de Pitágoras, aplicándolo a cualquier triángulo (no solo rectángulos)','La suma de ángulos internos','El área de un triángulo','La semejanza de triángulos'],ans:0},
+{mod:'m3',hint:'💡 Los ángulos internos de cualquier triángulo siempre suman 180°.',q:'¿Cuánto suman los ángulos internos de cualquier triángulo?',opts:['90°','180°','270°','360°'],ans:1},
+{mod:'m3',hint:'💡 La hipotenusa es siempre el lado más largo, opuesto al ángulo recto (90°).',q:'En un triángulo rectángulo, ¿qué es la hipotenusa?',opts:['El lado más corto','El lado opuesto al ángulo recto, siempre el más largo','Uno de los catetos','La altura del triángulo'],ans:1},
+{mod:'m3',hint:'💡 Un ángulo de 90° se llama recto; los triángulos que lo tienen se llaman rectángulos.',q:'¿Cómo se llama un ángulo de exactamente 90°?',opts:['Agudo','Obtuso','Recto','Llano'],ans:2},
+// ── m4: PROBABILIDAD Y ESTADÍSTICA ───────────────────────────
+{mod:'m4',hint:'💡 Si dos sucesos no pueden ocurrir al mismo tiempo, son mutuamente excluyentes.',q:'¿Qué significa que dos sucesos sean "mutuamente excluyentes"?',opts:['Que ambos pueden ocurrir juntos','Que no pueden ocurrir al mismo tiempo','Que tienen la misma probabilidad','Que son sucesos independientes'],ans:1},
+{mod:'m4',hint:'💡 Dos sucesos son independientes cuando que ocurra uno no cambia la probabilidad del otro.',q:'¿Qué significa que dos sucesos sean "independientes"?',opts:['Que no pueden ocurrir nunca juntos','Que la ocurrencia de uno no afecta la probabilidad del otro','Que tienen probabilidad 0','Que siempre ocurren juntos'],ans:1},
+{mod:'m4',hint:'💡 La probabilidad condicional es la probabilidad de un suceso, sabiendo que otro ya ocurrió.',q:'¿Qué es la probabilidad condicional?',opts:['La probabilidad de un suceso imposible','La probabilidad de que ocurra un suceso, dado que otro ya ocurrió','La probabilidad de dos sucesos mutuamente excluyentes','La suma de todas las probabilidades posibles'],ans:1},
+{mod:'m4',hint:'💡 Para sucesos independientes, la probabilidad compuesta es el producto de las probabilidades individuales.',q:'¿Cómo se calcula la probabilidad de que ocurran dos sucesos independientes a la vez?',opts:['Sumando sus probabilidades','Multiplicando sus probabilidades individuales','Restando sus probabilidades','Dividiendo una probabilidad por la otra'],ans:1},
+{mod:'m4',hint:'💡 La varianza mide qué tan dispersos están los datos respecto de la media (promedio).',q:'¿Qué mide la varianza en estadística?',opts:['El valor máximo de un conjunto de datos','Qué tan dispersos están los datos respecto de la media','La cantidad total de datos','El valor que más se repite'],ans:1},
+{mod:'m4',hint:'💡 El desvío estándar es la raíz cuadrada de la varianza, y se expresa en las mismas unidades que los datos.',q:'¿Cómo se relaciona el desvío estándar con la varianza?',opts:['Son exactamente lo mismo','El desvío estándar es la raíz cuadrada de la varianza','La varianza es la raíz cuadrada del desvío estándar','No tienen ninguna relación'],ans:1},
+{mod:'m4',hint:'💡 La probabilidad de un suceso siempre está entre 0 (imposible) y 1 (seguro).',q:'¿Entre qué valores se encuentra siempre la probabilidad de un suceso?',opts:['Entre -1 y 1','Entre 0 y 1','Entre 0 y 100','Entre 1 y 10'],ans:1},
+{mod:'m4',hint:'💡 La media (promedio) se calcula sumando todos los valores y dividiendo por la cantidad de datos.',q:'¿Cómo se calcula la media aritmética de un conjunto de datos?',opts:['Se toma el valor del medio','Se suman todos los valores y se dividen por la cantidad de datos','Se resta el mayor menos el menor','Se multiplican todos los valores'],ans:1},
+{mod:'m4',hint:'💡 La probabilidad clásica se calcula como casos favorables sobre casos posibles.',q:'¿Cómo se calcula la probabilidad clásica de un suceso?',opts:['Casos posibles sobre casos favorables','Casos favorables sobre casos posibles','Casos favorables más casos posibles','Casos posibles menos casos favorables'],ans:1},
+];
+</script>
+
+<!-- [004b] GUÍAS POR EJE — explicación breve + ejercicios de ejemplo -->
+<script>
+const GUIAS={
+  m1:{
+    titulo:'🔢 Números y Operaciones',
+    explicacion:[
+      'El conjunto de los <strong>números reales (R)</strong> incluye a los <strong>racionales (Q)</strong> — los que se pueden escribir como fracción — y a los <strong>irracionales (I)</strong> — como √2 o π — que no.',
+      'Trabajamos con <strong>potenciación y radicación</strong>: potencias de exponente negativo, raíces, y propiedades para simplificar (producto de raíces con igual índice, racionalización de denominadores).',
+      'La <strong>notación científica</strong> (a × 10ⁿ, con 1 ≤ a &lt; 10) sirve para escribir números muy grandes o muy chicos de forma compacta.'
+    ],
+    ejemplos:[
+      'Simplificar: √8 · √2 = √16 = 4',
+      'Escribir en notación científica: 45.000 = 4,5 × 10⁴',
+      'Calcular: 2⁻³ = 1/8'
+    ]
+  },
+  m2:{
+    titulo:'📈 Álgebra y Estudio de Funciones',
+    explicacion:[
+      'La <strong>función lineal</strong> y = mx + b tiene pendiente "m" (inclinación) y ordenada al origen "b" (dónde corta al eje y). Si m&gt;0 es creciente, si m&lt;0 es decreciente.',
+      'La <strong>función cuadrática</strong> f(x) = ax² + bx + c se grafica como una parábola, con vértice, eje de simetría y raíces (calculables con la fórmula resolvente).',
+      'Para <strong>polinomios</strong> de mayor grado usamos la Regla de Ruffini (dividir por x-a), el Teorema del Resto (P(a) = resto de dividir por x-a), y el Teorema de Gauss (para hallar posibles raíces racionales).'
+    ],
+    ejemplos:[
+      'Pendiente entre dos puntos: m = (y₂-y₁)/(x₂-x₁)',
+      'Raíces de x² - 5x + 6 = 0 → x = 2 y x = 3 (fórmula resolvente)',
+      'Dividir x³-2x²-x+2 por (x-1) usando Ruffini'
+    ]
+  },
+  m3:{
+    titulo:'📐 Geometría y Magnitudes (Trigonometría)',
+    explicacion:[
+      'En un triángulo rectángulo: <strong>seno</strong> = opuesto/hipotenusa, <strong>coseno</strong> = adyacente/hipotenusa, <strong>tangente</strong> = opuesto/adyacente.',
+      'El <strong>Teorema de Pitágoras</strong> (a² + b² = c²) solo aplica a triángulos rectángulos.',
+      'Para triángulos que NO son rectángulos usamos el <strong>Teorema del Seno</strong> y el <strong>Teorema del Coseno</strong>, y el concepto de <strong>semejanza de triángulos</strong>.'
+    ],
+    ejemplos:[
+      'Si un cateto mide 3 y la hipotenusa 5, el otro cateto mide 4 (Pitágoras: 3²+4²=5²)',
+      'sen(30°) = 0,5 — valor de referencia para memorizar',
+      'Dos triángulos son semejantes si sus ángulos correspondientes son iguales'
+    ]
+  },
+  m4:{
+    titulo:'🎲 Probabilidad y Estadística',
+    explicacion:[
+      'Dos sucesos son <strong>mutuamente excluyentes</strong> si no pueden pasar juntos; son <strong>independientes</strong> si uno no afecta la probabilidad del otro.',
+      'La <strong>probabilidad condicional</strong> es la probabilidad de un suceso sabiendo que otro ya ocurrió. Para sucesos independientes, la probabilidad compuesta se calcula multiplicando.',
+      'La <strong>varianza</strong> mide la dispersión de los datos respecto de la media; el <strong>desvío estándar</strong> es su raíz cuadrada.'
+    ],
+    ejemplos:[
+      'P(cara y cara al tirar 2 monedas) = 1/2 · 1/2 = 1/4',
+      'Probabilidad clásica = casos favorables / casos posibles',
+      'Si los datos son 2,4,4,6: media = 4, y de ahí se calcula la varianza'
+    ]
+  }
+};
+</script>
+
+<!-- [005-013] LÓGICA -->
+<script>
+// [005] CONFIG BACKEND
+// ⚠️ Backend propio pendiente de deployar para este proyecto (Matemática),
+// separado del de NTICx. Mientras tanto, guarda todo localmente (localStorage)
+// y el ranking/panel docente muestran solo datos de este dispositivo.
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxaiQSCjrUU6yK5ABJP7RKN_uDc6dx8dqU3HTRbCOSCvjtaEW4GacefTvOzq7590Set/exec';
+const CLAVE_DOCENTE='profe2025';
+
+function apiGet(params){
+  if(!SCRIPT_URL)return Promise.resolve({error:'Backend no configurado todavía'});
+  return new Promise((resolve)=>{
+    const cbName='cb_'+Math.random().toString(36).slice(2);
+    const url=SCRIPT_URL+'?'+new URLSearchParams({...params,callback:cbName});
+    const script=document.createElement('script');
+    const timer=setTimeout(()=>{
+      delete window[cbName];try{document.body.removeChild(script);}catch(e){}
+      resolve({error:'Sin conexión'});
+    },8000);
+    window[cbName]=function(data){
+      clearTimeout(timer);delete window[cbName];
+      try{document.body.removeChild(script);}catch(e){}
+      resolve(data);
+    };
+    script.src=url;
+    script.onerror=()=>{clearTimeout(timer);delete window[cbName];resolve({error:'Sin conexión'});};
+    document.body.appendChild(script);
+  });
+}
+async function apiPost(data){
+  if(!SCRIPT_URL)return;
+  try{
+    fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(data),headers:{'Content-Type':'application/json'}});
+  }catch(e){console.warn('apiPost error',e);}
+}
+
+// [006] EQUIPO / LOGIN SIMPLE
+const LS_USER='mundialmate_user';
+const LS_SCORES='mundialmate_local_scores';
+const LS_EJES_ACTIVOS='mundialmate_ejes_activos';
+const LS_CUSTOM_Q='mundialmate_custom_preguntas';
+
+let currentUser=null;
+let pendingScore=null;
+let pendingResume=false;
+
+function slug(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'')||'equipo';}
+
+function loadSavedUser(){
+  try{const u=JSON.parse(localStorage.getItem(LS_USER)||'null');if(u){currentUser=u;updateTopbar();}}catch(e){}
+}
+function getLocalScores(){try{return JSON.parse(localStorage.getItem(LS_SCORES)||'{}');}catch(e){return{};}}
+function saveLocalScore(temaId,score){
+  const s=getLocalScores();
+  if(!s[temaId]||score>s[temaId])s[temaId]=score;
+  try{localStorage.setItem(LS_SCORES,JSON.stringify(s));}catch(e){}
+}
+
+function updateTopbar(){
+  const btns=document.getElementById('topbar-btns');
+  if(currentUser){
+    document.getElementById('user-avatar').textContent=currentUser.nombre.charAt(0).toUpperCase();
+    document.getElementById('user-name-display').textContent=currentUser.nombre;
+    document.getElementById('user-mail-display').textContent=currentUser.integrantes&&currentUser.integrantes.length>1
+      ?('👥 '+currentUser.integrantes.join(', '))
+      :'🙋 Jugador individual';
+    btns.innerHTML=`
+      <button class="tb-btn ranking" onclick="openRanking()">🏆 Tabla de posiciones</button>
+      <button class="tb-btn logout" onclick="doLogout()">Cambiar equipo</button>`;
+  }else{
+    document.getElementById('user-avatar').textContent='📐';
+    document.getElementById('user-name-display').textContent='Sin equipo';
+    document.getElementById('user-mail-display').textContent='Anotate para guardar tus goles';
+    btns.innerHTML=`
+      <button class="tb-btn ranking" onclick="openRanking()">🏆 Tabla de posiciones</button>
+      <button class="tb-btn login-cta" onclick="openAuth()">⚽ Anotar mi equipo</button>`;
+  }
+}
+
+function openAuth(){
+  pendingResume=false;
+  document.getElementById('auth-sub').textContent='Sin contraseña, sin vueltas. Poné tu nombre (o el de tu equipo) y arrancamos.';
+  document.getElementById('auth-skip-mid').style.display='none';
+  document.getElementById('auth-overlay').classList.add('open');
+  switchAuthTab('individual');
+}
+function switchAuthTab(tab){
+  document.getElementById('tab-ind').classList.toggle('active',tab==='individual');
+  document.getElementById('tab-equipo').classList.toggle('active',tab==='equipo');
+  document.getElementById('form-individual').style.display=tab==='individual'?'block':'none';
+  document.getElementById('form-equipo').style.display=tab==='equipo'?'block':'none';
+  clearAuthMsg();
+}
+function showAuthMsg(txt,type){const el=document.getElementById('auth-msg');el.textContent=txt;el.className='auth-msg show '+type;}
+function clearAuthMsg(){const el=document.getElementById('auth-msg');el.className='auth-msg';el.textContent='';}
+
+function doStartTeam(){
+  const isEquipo=document.getElementById('tab-equipo').classList.contains('active');
+  let nombre='',integrantes=[];
+  if(isEquipo){
+    nombre=document.getElementById('eq-nombre').value.trim();
+    integrantes=document.getElementById('eq-integrantes').value.split('\n').map(s=>s.trim()).filter(Boolean);
+    if(!nombre){showAuthMsg('Poné el nombre del equipo.','error');return;}
+    if(!integrantes.length){showAuthMsg('Escribí al menos un integrante (nombre y apellido).','error');return;}
+  }else{
+    nombre=document.getElementById('ind-nombre').value.trim();
+    if(!nombre){showAuthMsg('Poné tu nombre y apellido.','error');return;}
+    integrantes=[nombre];
+  }
+  currentUser={nombre,integrantes,mail:slug(nombre)+'@mundialmate.nticx'};
+  localStorage.setItem(LS_USER,JSON.stringify(currentUser));
+  updateTopbar();
+  apiPost({action:'register',nombre:currentUser.nombre,mail:currentUser.mail,pass:'mundial',integrantes:currentUser.integrantes.join('|')});
+  syncAllLocalScores();
+  document.getElementById('auth-overlay').classList.remove('open');
+  document.getElementById('auth-skip-mid').style.display='none';
+  clearAuthMsg();
+  if(pendingResume){pendingResume=false;renderQuestion();return;}
+  if(pendingScore){const s=pendingScore;pendingScore=null;uploadScore(s);showResult();}
+}
+function doLogout(){currentUser=null;localStorage.removeItem(LS_USER);updateTopbar();}
+
+async function uploadScore(scoreData){
+  if(!currentUser)return;
+  await apiPost({action:'saveScore',...scoreData,mail:currentUser.mail,nombre:currentUser.nombre});
+}
+async function syncAllLocalScores(){
+  const scores=getLocalScores();
+  const entries=Object.entries(scores);
+  if(!entries.length||!currentUser)return;
+  const hoy=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const payload=entries.map(([tema,puntaje])=>({mail:currentUser.mail,nombre:currentUser.nombre,tema,puntaje,total:10,fecha:hoy}));
+  await apiPost({action:'syncScores',scores:payload});
+}
+
+// [007] MÚSICA "DESAFÍO"
+let musicCtx=null,musicOn=false,musicTimer=null;
+function ensureCtx(){if(!musicCtx)musicCtx=new (window.AudioContext||window.webkitAudioContext)();return musicCtx;}
+function musicBeep(ctx,t,freq,dur,vol,type){
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.connect(g);g.connect(ctx.destination);
+  o.type=type||'square';o.frequency.value=freq;
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(vol,t+.01);
+  g.gain.exponentialRampToValueAtTime(.001,t+dur);
+  o.start(t);o.stop(t+dur+.02);
+}
+function musicKick(ctx,t){
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.connect(g);g.connect(ctx.destination);
+  o.type='sine';o.frequency.setValueAtTime(140,t);o.frequency.exponentialRampToValueAtTime(45,t+.12);
+  g.gain.setValueAtTime(.22,t);g.gain.exponentialRampToValueAtTime(.001,t+.14);
+  o.start(t);o.stop(t+.15);
+}
+function musicHat(ctx,t){
+  const bufferSize=ctx.sampleRate*.03;
+  const buffer=ctx.createBuffer(1,bufferSize,ctx.sampleRate);
+  const data=buffer.getChannelData(0);
+  for(let i=0;i<bufferSize;i++)data[i]=(Math.random()*2-1)*.15;
+  const src=ctx.createBufferSource();src.buffer=buffer;
+  const g=ctx.createGain();g.gain.setValueAtTime(.12,t);g.gain.exponentialRampToValueAtTime(.001,t+.03);
+  src.connect(g);g.connect(ctx.destination);
+  src.start(t);
+}
+const bassLine=[110,110,146.8,110,130.8,110,98,110];
+function scheduleMusicBar(){
+  if(!musicOn)return;
+  const ctx=ensureCtx();
+  const now=ctx.currentTime+.05;
+  const bpm=132,beat=60/bpm;
+  for(let i=0;i<8;i++){
+    const t=now+i*(beat/2);
+    if(i%2===0)musicKick(ctx,t);
+    musicHat(ctx,t);
+    musicBeep(ctx,t,bassLine[i%bassLine.length],beat/2*.9,.05,'sawtooth');
+    if(i%4===2)musicBeep(ctx,t,880,.08,.03,'square');
+  }
+  musicTimer=setTimeout(scheduleMusicBar,beat*4*1000);
+}
+function toggleMusic(){
+  musicOn=!musicOn;
+  const btn=document.getElementById('music-btn');
+  if(musicOn){
+    ensureCtx();if(musicCtx.state==='suspended')musicCtx.resume();
+    btn.textContent='🔊';btn.classList.add('on');
+    scheduleMusicBar();
+  }else{
+    btn.textContent='🔇';btn.classList.remove('on');
+    clearTimeout(musicTimer);
+  }
+}
+function startMusicForQuiz(){musicOn=false;toggleMusic();}
+function stopMusic(){musicOn=true;toggleMusic();}
+
+// ── BÚHO SABIO ──
+const BUHO_CONFIG={
+  m1:{mod:'🔢 Números',color:'var(--c1)'},
+  m2:{mod:'📈 Álgebra y Funciones',color:'var(--c2)'},
+  m3:{mod:'📐 Geometría',color:'var(--c3)'},
+  m4:{mod:'🎲 Probabilidad',color:'var(--c4)'},
+};
+function mostrarBuhoFlotante(q){
+  const prev=document.getElementById('buho-flotante');
+  if(prev)prev.remove();
+  const cfg=BUHO_CONFIG[q.mod];
+  const pista=q.hint;
+  const isMobile=window.innerWidth<600;
+  const posiciones=isMobile
+    ?[{bottom:'1rem',right:'1rem',left:'auto',top:'auto',align:'flex-end'},
+      {bottom:'1rem',left:'1rem',right:'auto',top:'auto',align:'flex-start'}]
+    :[{bottom:'1.25rem',right:'1.25rem',left:'auto',top:'auto',align:'flex-end'},
+      {bottom:'1.25rem',left:'1.25rem',right:'auto',top:'auto',align:'flex-start'},
+      {top:'5rem',right:'1.25rem',left:'auto',bottom:'auto',align:'flex-end'},
+      {top:'5rem',left:'1.25rem',right:'auto',bottom:'auto',align:'flex-start'}];
+  const pos=posiciones[Math.floor(Math.random()*posiciones.length)];
+  const maxW=isMobile?'calc(100vw - 2rem)':'300px';
+  const wrap=document.createElement('div');
+  wrap.id='buho-flotante';
+  wrap.className='buho-flotante-wrap';
+  wrap.style.cssText=`position:fixed;bottom:${pos.bottom||'auto'};top:${pos.top||'auto'};right:${pos.right||'auto'};left:${pos.left||'auto'};z-index:6000;display:flex;flex-direction:column;align-items:${pos.align};gap:.5rem`;
+  wrap.innerHTML=`
+    <div id="buho-burbuja" style="display:block;background:var(--card);border:1.5px solid ${cfg.color};border-radius:16px;padding:.85rem 1rem;max-width:${maxW};width:${isMobile?'calc(100vw - 2rem)':'300px'};box-shadow:0 8px 32px rgba(0,0,0,.4);animation:slideUpBuho .4s cubic-bezier(.34,1.56,.64,1)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.45rem">
+        <span style="font-family:var(--fh);font-size:.76rem;font-weight:800;color:${cfg.color}">🦉 Búho Sabio · ${cfg.mod}</span>
+        <span onclick="toggleBuho()" style="cursor:pointer;color:var(--muted);font-size:.8rem;padding:.1rem .45rem;border-radius:99px;background:var(--card2)">✕</span>
+      </div>
+      <div style="font-size:${isMobile?'.8rem':'.85rem'};line-height:1.5;color:var(--text)">${pista}</div>
+    </div>
+    <div onclick="toggleBuho()" id="buho-chip" style="background:var(--card);border:2px solid ${cfg.color};border-radius:99px;padding:.45rem .85rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.35);animation:buhoEntrada .4s cubic-bezier(.34,1.56,.64,1)">
+      <span style="font-size:${isMobile?'1.3rem':'1.6rem'};animation:buhoFloat 2.5s ease-in-out infinite">🦉</span>
+      <div>
+        <div style="font-family:var(--fh);font-size:.72rem;font-weight:800;color:${cfg.color}">Búho Sabio</div>
+        <div style="font-size:.62rem;color:var(--muted)">Contexto 💡</div>
+      </div>
+    </div>`;
+  document.body.appendChild(wrap);
+}
+function toggleBuho(){
+  const burbuja=document.getElementById('buho-burbuja');
+  const chip=document.getElementById('buho-chip');
+  if(!burbuja)return;
+  const visible=burbuja.style.display!=='none';
+  burbuja.style.display=visible?'none':'block';
+  if(chip)chip.style.opacity=visible?'1':'.7';
+}
+function cerrarBuho(){
+  const el=document.getElementById('buho-flotante');
+  if(el){el.style.opacity='0';el.style.transition='opacity .2s';setTimeout(()=>el.remove(),200);}
+}
+
+// ── CONTENIDO: ejes activos + preguntas del docente ──────────
+function getEjesActivos(){
+  try{
+    const s=JSON.parse(localStorage.getItem(LS_EJES_ACTIVOS)||'null');
+    if(s)return s;
+  }catch(e){}
+  const def={};Object.keys(MODS).forEach(m=>def[m]=true);
+  return def;
+}
+function setEjeActivo(mod,activo){
+  const s=getEjesActivos();s[mod]=activo;
+  localStorage.setItem(LS_EJES_ACTIVOS,JSON.stringify(s));
+  renderHome();
+}
+function getCustomQuestions(){try{return JSON.parse(localStorage.getItem(LS_CUSTOM_Q)||'[]');}catch(e){return[];}}
+function saveCustomQuestions(arr){localStorage.setItem(LS_CUSTOM_Q,JSON.stringify(arr));}
+function fullBank(){return [...BANK_BUILTIN, ...getCustomQuestions()];}
+
+// [008] QUIZ LOGIC + TIMER 10 MIN
+function temaDefs(){
+  const activos=getEjesActivos();
+  const base=[
+    {id:'E1',label:'Eje 1',mod:'m1',icon:'🔢',color:'t0'},
+    {id:'E2',label:'Eje 2',mod:'m2',icon:'📈',color:'t1'},
+    {id:'E3',label:'Eje 3',mod:'m3',icon:'📐',color:'t2'},
+    {id:'E4',label:'Eje 4',mod:'m4',icon:'🎲',color:'t3'},
+  ].filter(d=>activos[d.mod]!==false);
+  base.push({id:'FINAL',label:'GRAN FINAL',mod:'all',icon:'🏆',color:'t5'});
+  return base;
+}
+const QUIZ_MINUTES=10;
+
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function buildQuestions(temaId){
+  const defs=temaDefs();
+  const def=defs.find(t=>t.id===temaId);
+  const bank=fullBank();
+  if(def.mod==='all'){
+    const activos=getEjesActivos();
+    const mods=Object.keys(MODS).filter(m=>activos[m]!==false);
+    let chosen=[];
+    mods.forEach(m=>{chosen.push(...shuffle(bank.filter(q=>q.mod===m)).slice(0,3));});
+    return shuffle(chosen).slice(0,10);
+  }
+  return shuffle(bank.filter(q=>q.mod===def.mod)).slice(0,10);
+}
+
+function getLogro(pct){
+  if(pct==null) return {medal:'',label:'',color:''};
+  if(pct===100) return {medal:'🏆🐐',label:'¡CAMPEONES DEL MUNDO!',color:'#ffd54a'};
+  if(pct>=90)   return {medal:'⭐⭐⭐',label:'GOLAZO — nivel crack',color:'#ffd54a'};
+  if(pct>=75)   return {medal:'🥇',label:'Muy buen partido',color:'#6cace4'};
+  if(pct>=60)   return {medal:'🥈',label:'Buen resultado',color:'#4ade80'};
+  if(pct>=50)   return {medal:'🥉',label:'Empate ajustado',color:'#ffab2e'};
+  return {medal:'🔁',label:'A entrenar para el próximo partido',color:'#ff5a7a'};
+}
+
+function renderHome(){
+  const scores=getLocalScores();
+  const defs=temaDefs();
+  const grupales=defs.filter(t=>t.id!=='FINAL');
+  const completados=grupales.filter(t=>scores[t.id]!=null).length;
+  const totalTemas=grupales.length;
+  const grid=document.getElementById('temas-grid');
+
+  document.getElementById('mod-names-bar').innerHTML=grupales.map(d=>`<div class="mod-chip">${MODS[d.mod]}</div>`).join('');
+
+  let motivMsg='';
+  if(completados===0) motivMsg='<div style="text-align:center;margin-bottom:1.5rem;font-size:.88rem;color:var(--muted)">⚽ ¡Elegí el Eje 1 y arrancá el Mundial!</div>';
+  else if(completados<totalTemas) motivMsg=`<div style="text-align:center;margin-bottom:1.5rem;font-size:.88rem;color:var(--c4)">🔥 Vas ${completados} de ${totalTemas} ejes. ¡Seguí jugando!</div>`;
+  else motivMsg='<div style="text-align:center;margin-bottom:1.5rem;font-size:.88rem;color:var(--c3)">🏆 ¡Completaste todos los ejes! Ya podés jugar la Gran Final.</div>';
+
+  const progPct=totalTemas?Math.round((completados/totalTemas)*100):0;
+  const progressBar=`
+    <div style="margin-bottom:1.5rem;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+        <span style="font-family:var(--fh);font-size:.8rem;font-weight:800;color:var(--text)">🗺️ Progreso</span>
+        <span style="font-family:var(--fh);font-size:.8rem;font-weight:800;color:var(--c2)">${completados}/${totalTemas} · ${progPct}%</span>
+      </div>
+      <div style="height:10px;background:var(--card2);border-radius:99px;overflow:hidden">
+        <div style="height:100%;width:${progPct}%;background:linear-gradient(90deg,var(--c1),var(--c2));border-radius:99px;transition:width .6s ease"></div>
+      </div>
+    </div>`;
+
+  grid.innerHTML = `
+    <div style="grid-column:1/-1">${motivMsg}${progressBar}</div>
+    ${defs.map(def=>{
+    const best=scores[def.id];
+    const totalQ=10;
+    const pct=best!=null?Math.round((best/totalQ)*100):null;
+    const logro=getLogro(pct);
+    const isDone=pct!=null&&pct>=60;
+    const isFinal=def.id==='FINAL';
+    const locked=isFinal&&completados<totalTemas;
+
+    const badge=pct!=null
+      ?`<span class="t-badge" style="background:${isDone?'rgba(74,222,128,.18)':'rgba(255,90,122,.15)'};color:${isDone?'#4ade80':'#ff5a7a'};border:1px solid ${isDone?'rgba(74,222,128,.3)':'rgba(255,90,122,.2)'}">${isDone?'✓':''} ${pct}%</span>`
+      :(locked?'<span class="t-badge" style="background:rgba(255,255,255,.08);color:var(--muted)">🔒</span>':'');
+
+    const logroBlock=best!=null?`
+      <div style="margin-top:.5rem;display:flex;align-items:center;justify-content:center;gap:.4rem;flex-wrap:wrap">
+        <span style="font-size:1.3rem">${logro.medal}</span>
+        <div>
+          <div style="font-family:var(--fh);font-size:.73rem;font-weight:800;color:${logro.color}">${logro.label}</div>
+          <div style="font-size:.66rem;color:var(--muted)">${best}/${totalQ} pts · ${pct}%</div>
+        </div>
+      </div>`
+      :`<div style="margin-top:.5rem;font-size:.72rem;color:var(--muted)">${locked?'Ganá todos los ejes para desbloquear':'Sin intentos aún'}</div>`;
+
+    return `<div class="tema-card ${def.color}" onclick="${locked?'':`startQuiz('${def.id}')`}" style="${locked?'opacity:.55;cursor:not-allowed':''}">
+      ${badge}
+      <div class="jersey">${def.mod==='all'?'🏆':def.mod.slice(1)}</div>
+      <div class="t-icon">${def.icon}</div>
+      <div class="t-label">${def.label}</div>
+      <div class="t-sub">${isFinal?'10 preguntas · todos los ejes':'10 preguntas · '+MODS[def.mod]}</div>
+      ${logroBlock}
+      ${!isFinal?`<div class="btn-row">
+        <button class="mini-btn" onclick="event.stopPropagation();openGuia('${def.mod}')">📖 Guía</button>
+        <button class="mini-btn" onclick="event.stopPropagation();openPrint('${def.id}')">🖨️ Imprimir</button>
+      </div>`:''}
+    </div>`;
+  }).join('')}`;
+}
+
+let quizState=null;
+let quizTimerInterval=null;
+let quizSecondsLeft=0;
+
+function startQuiz(temaId){
+  const def=temaDefs().find(t=>t.id===temaId);
+  const questions=buildQuestions(temaId);
+  quizState={questions,idx:0,score:0,answers:[],temaId,byMod:{}};
+  Object.keys(MODS).forEach(m=>{quizState.byMod[m]={correct:0,total:0};});
+  document.getElementById('quiz-title').textContent=`${def.icon} ${def.label}`;
+  showScreen('quiz');
+  startQuizTimer();
+  startMusicForQuiz();
+  renderQuestion();
+}
+
+function startQuizTimer(){
+  clearInterval(quizTimerInterval);
+  quizSecondsLeft=QUIZ_MINUTES*60;
+  updateTimerDisplay();
+  quizTimerInterval=setInterval(()=>{
+    quizSecondsLeft--;
+    updateTimerDisplay();
+    if(quizSecondsLeft<=0){
+      clearInterval(quizTimerInterval);
+      finishQuizByTimeout();
+    }
+  },1000);
+}
+function updateTimerDisplay(){
+  const chip=document.getElementById('timer-chip');
+  if(!chip)return;
+  const m=Math.floor(quizSecondsLeft/60),s=quizSecondsLeft%60;
+  chip.textContent=`⏱️ ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  chip.classList.toggle('warn',quizSecondsLeft<=120&&quizSecondsLeft>30);
+  chip.classList.toggle('danger',quizSecondsLeft<=30);
+}
+function finishQuizByTimeout(){
+  cerrarBuho();
+  while(quizState.answers.length<quizState.questions.length){
+    const q=quizState.questions[quizState.answers.length];
+    quizState.answers.push(false);
+    quizState.byMod[q.mod].total++;
+  }
+  concludeQuiz();
+}
+
+function renderQuestion(){
+  const{questions,idx,score}=quizState;
+  const total=questions.length;
+  document.getElementById('prog-fill').style.width=(idx/total*100)+'%';
+  document.getElementById('prog-label').textContent=`Pregunta ${idx+1} de ${total}`;
+  document.getElementById('quiz-score-live').textContent=score+' pts';
+  document.getElementById('streak-bar').innerHTML=questions.map((_,i)=>{
+    if(i>=idx)return'<div class="streak-dot"></div>';
+    return`<div class="streak-dot ${quizState.answers[i]?'ok':'ko'}"></div>`;
+  }).join('');
+  const q=questions[idx];
+  renderPregunta(q, idx, total);
+  setTimeout(()=>mostrarBuhoFlotante(q), 500);
+}
+
+function renderPregunta(q, idx, total){
+  const letters=['A','B','C','D'];
+  const correctDisplayIdx=q.ans;
+  const optsHtml=[0,1,2,3].map((origIdx,di)=>
+    `<button class="opt" onclick="selectAnswer(${di},${correctDisplayIdx})"><span class="opt-letter">${letters[di]}</span>${q.opts[origIdx]}</button>`
+  ).join('');
+  document.getElementById('q-container').innerHTML=`
+    <div class="q-card" style="animation:slideInCard .3s ease">
+      <div class="q-mod">${MODS[q.mod]}</div>
+      <div class="q-num-badge">Pregunta ${idx+1}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="opts">${optsHtml}</div>
+      <div class="feedback" id="feedback"></div>
+    </div>`;
+}
+
+function selectAnswer(selectedIdx,correctIdx){
+  const opts=document.querySelectorAll('.opt');
+  opts.forEach(o=>o.disabled=true);
+  cerrarBuho();
+  const isCorrect=selectedIdx===correctIdx;
+  opts[selectedIdx].classList.add(isCorrect?'correct':'wrong');
+  if(!isCorrect)opts[correctIdx].classList.add('correct');
+  const q=quizState.questions[quizState.idx];
+  quizState.answers.push(isCorrect);
+  quizState.byMod[q.mod].total++;
+  if(isCorrect){quizState.score++;quizState.byMod[q.mod].correct++;}
+
+  const answers=quizState.answers;
+  let racha=0;
+  for(let i=answers.length-1;i>=0;i--){if(answers[i])racha++;else break;}
+
+  const msgsOk=[
+    ['⚽ ¡GOOOL! 🎯','⚽ ¡Correcto! 💡','⚽ ¡Bien ahí! 👍'],
+    ['🔥 ¡Doblete! 2 seguidas','⚡ ¡Racha de 2! 💪'],
+    ['🔥🔥 ¡Hat-trick! 3 seguidas','💥 ¡Vas volando!'],
+    ['🌟 ¡4 seguidas! Sos figura','💪 ¡Imparable!'],
+    ['🏆 ¡5 SEGUIDAS! Balón de Oro','🔥🔥🔥 ¡Sos una máquina!'],
+  ];
+  const msgIdx=Math.min(racha-1,4);
+  const pool=msgsOk[msgIdx]||msgsOk[0];
+  const msgOk=pool[Math.floor(Math.random()*pool.length)];
+
+  const msgsKo=[
+    '❌ Se te escapó — ¡la próxima entra! 💪',
+    '❌ Pegó en el palo — ¡seguimos! 🚀',
+    '❌ Esa no era — repasá la guía de este eje 📚',
+    '❌ Off-side, pero seguimos jugando 🧠',
+    '❌ No te bajes — ¡todavía podés dar vuelta el partido! 🔥',
+  ];
+  const msgKo=msgsKo[Math.floor(Math.random()*msgsKo.length)];
+
+  const totalQ=quizState.questions.length;
+  const respondidas=quizState.idx+1;
+  const restantes=totalQ-respondidas;
+  let progMsg='';
+  if(restantes===0) progMsg='🏁 ¡Último minuto del partido!';
+  else if(restantes===1) progMsg='📌 Falta 1 pregunta — tiempo de descuento';
+  else if(respondidas===Math.floor(totalQ/2)) progMsg='⚡ ¡Entretiempo!';
+  else if(isCorrect&&racha>=3) progMsg=`🔥 Racha activa: ${racha} correctas seguidas`;
+
+  const fb=document.getElementById('feedback');
+  fb.classList.add('show',isCorrect?'ok':'ko');
+  fb.innerHTML=`
+    <div style="font-weight:700;font-size:.92rem">${isCorrect?msgOk:msgKo}</div>
+    ${!isCorrect?`<div style="margin-top:.3rem;font-size:.82rem;opacity:.85">La respuesta correcta era: <strong>${String.fromCharCode(65+correctIdx)}</strong></div>`:''}
+    ${progMsg?`<div style="margin-top:.35rem;font-size:.78rem;opacity:.75">${progMsg}</div>`:''}
+    <div style="margin-top:.35rem;font-size:.75rem;opacity:.65">Puntaje: ${quizState.score} pts · Pregunta ${respondidas}/${totalQ}</div>
+  `;
+
+  if(isCorrect&&(racha%5===0||racha===3||quizState.score===totalQ))showCombo(quizState.score,totalQ);
+
+  const nb=document.createElement('button');
+  nb.className='next-btn';
+  nb.textContent=restantes>0?'Siguiente →':'Ver resultado 🏁';
+  nb.onclick=nextQuestion;
+  fb.after(nb);
+}
+
+function nextQuestion(){
+  quizState.idx++;
+  if(quizState.idx>=quizState.questions.length){
+    concludeQuiz();
+  } else if(!currentUser && quizState.idx%5===0){
+    openMidQuizReminder();
+  } else {
+    renderQuestion();
+  }
+}
+
+function openMidQuizReminder(){
+  pendingResume=true;
+  document.getElementById('auth-sub').textContent='¡Vas '+quizState.idx+' de '+quizState.questions.length+'! Anotate ahora para no perder tu progreso — no hace falta contraseña.';
+  document.getElementById('auth-skip-mid').style.display='block';
+  document.getElementById('auth-overlay').classList.add('open');
+  switchAuthTab('individual');
+}
+function skipMidReminder(){
+  pendingResume=false;
+  document.getElementById('auth-overlay').classList.remove('open');
+  clearAuthMsg();
+  renderQuestion();
+}
+
+function concludeQuiz(){
+  clearInterval(quizTimerInterval);
+  stopMusic();
+  if(!currentUser){
+    const hoy=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+    pendingScore={tema:quizState.temaId,puntaje:quizState.score,total:quizState.questions.length,fecha:hoy};
+    pendingResume=false;
+    document.getElementById('auth-sub').textContent='¡Terminó el partido! Anotá tu nombre o el de tu equipo para ver el resultado y guardar tu puntaje.';
+    document.getElementById('auth-skip-mid').style.display='none';
+    document.getElementById('auth-overlay').classList.add('open');
+    switchAuthTab('individual');
+  }else{
+    showResult();
+  }
+}
+
+function showCombo(score,totalQ){
+  const pct=Math.round(score/totalQ*100);
+  let msgs;
+  if(pct>=100)msgs=['🎊 ¡PERFECTO! 🏆','💯 ¡Puntaje máximo!','🥇 ¡Imbatible!'];
+  else if(pct>=70)msgs=['💥 ¡Gran nivel!','🎯 ¡Crack total!','🌟 ¡Sos una máquina!'];
+  else msgs=['🔥 ¡En racha!','⚡ ¡Combo!','💥 ¡Seguí así!'];
+  const txt=msgs[Math.floor(Math.random()*msgs.length)];
+  const el=document.createElement('div');
+  el.className='combo-flash';
+  el.style.color=pct>=100?'var(--c2)':pct>=70?'var(--c3)':'var(--c4)';
+  el.textContent=txt;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),900);
+}
+
+// [010] RESULTADO + COMPARTIR
+async function showResult(){
+  const{score,questions,temaId,byMod}=quizState;
+  const total=questions.length;
+  const pct=score/total;
+  saveLocalScore(temaId,score);
+  renderHome();
+
+  let emoji,title,stars,msg;
+  const esPerfecto=score===total;
+  if(esPerfecto){emoji='🏆';title='¡¡¡CAMPEONES DEL MUNDO!!! 🐐🇦🇷';stars='🌟🌟🌟';msg='¡PUNTAJE PERFECTO! Sos una LEYENDA del Mundial Matemático. ¡Tres estrellas en el pecho! ⭐⭐⭐';}
+  else if(pct>=0.9){emoji='🥇';title='¡GOLAZO DE MEDIA CANCHA!';stars='⭐⭐⭐';msg='¡Nivel crack absoluto! Dominás el tema como un 10. 🔥';}
+  else if(pct>=0.75){emoji='🎉';title='¡GRAN PARTIDO!';stars='⭐⭐⭐';msg='Excelente actuación. Repasá lo poquito que falló y sos figura. 💪';}
+  else if(pct>=0.6){emoji='👍';title='¡Buen resultado!';stars='⭐⭐';msg='Ganaste el partido. Hay algunos temas para afianzar. 📚';}
+  else if(pct>=0.5){emoji='⚖️';title='Empate ajustado';stars='⭐⭐';msg='Vas por la mitad. ¡Repasá la guía y volvé a intentarlo! 💡';}
+  else{emoji='🔁';title='¡A entrenar para el próximo partido!';stars='⭐';msg='Repasá la guía de este eje y volvé a jugar. ¡Cada intento suma! 🚀';}
+
+  const incorrectas=questions.filter((_,i)=>!quizState.answers[i]);
+  const reviewHtml=incorrectas.length>0?`
+    <div class="review-box">
+      <div class="review-title">📚 Temas para repasar</div>
+      ${incorrectas.slice(0,5).map(q=>`<div class="review-item">${q.q}</div>`).join('')}
+      ${incorrectas.length>5?`<div style="font-size:.8rem;color:var(--muted);margin-top:.4rem">+ ${incorrectas.length-5} más</div>`:''}
+    </div>`:'';
+
+  const breakdownHtml=Object.entries(byMod).filter(([,d])=>d.total>0).map(([m,d])=>{
+    const mp=d.total>0?Math.round((d.correct/d.total)*100):0;
+    const mc=mp>=70?'var(--c3)':mp>=50?'var(--c4)':'var(--c5)';
+    return`<div class="brow">
+      <div class="brow-name">${MODS[m]}</div>
+      <div class="brow-score" style="color:${mc}">${d.correct}/${d.total}</div>
+      <div class="brow-bar-wrap"><div class="brow-bar" style="width:${mp}%;background:${mc}"></div></div>
+    </div>`;
+  }).join('');
+
+  const best=getLocalScores()[temaId]||score;
+  const scoreData={tema:temaId,puntaje:score,total,fecha:new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})};
+  let saveHtml='';
+  if(currentUser){
+    await uploadScore(scoreData);
+    saveHtml=SCRIPT_URL
+      ?`<div style="background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.2);border-radius:8px;padding:.6rem .9rem;font-size:.82rem;color:var(--c3);margin-bottom:1rem">☁️ Resultado guardado en la tabla de posiciones</div>`
+      :`<div style="background:rgba(108,172,228,.08);border:1px solid rgba(108,172,228,.2);border-radius:8px;padding:.6rem .9rem;font-size:.82rem;color:var(--c1);margin-bottom:1rem">💾 Guardado en este dispositivo (el backend en la nube todavía no está configurado)</div>`;
+  }
+
+  const def=temaDefs().find(t=>t.id===temaId);
+  const shareText=`🏆 Mundial Matemático — ${currentUser?currentUser.nombre:'Equipo'}\n⚽ ${def.label}: ${score}/${total} (${Math.round(pct*100)}%)\n${esPerfecto?'¡CAMPEONES DEL MUNDO! 🐐🇦🇷':'¡A seguir entrenando! 🔥'}`;
+  const waUrl='https://wa.me/?text='+encodeURIComponent(shareText);
+  const mailUrl='mailto:?subject='+encodeURIComponent('Resultado — Mundial Matemático')+'&body='+encodeURIComponent(shareText);
+
+  const shareHtml=`
+    <div class="share-box">
+      <div class="share-title">📣 Compartir resultado</div>
+      <div class="share-btns">
+        <a class="share-btn wa" href="${waUrl}" target="_blank" rel="noopener">📱 WhatsApp</a>
+        <a class="share-btn mail" href="${mailUrl}">✉️ Mail / Delta Chat</a>
+      </div>
+      <div style="font-size:.7rem;color:var(--muted);text-align:center;margin-top:.6rem">Delta Chat funciona sobre mail, así que el botón de Mail también sirve ahí.</div>
+    </div>`;
+
+  document.getElementById('result-card').className='result-card'+(esPerfecto?' champion':'');
+  document.getElementById('result-card').innerHTML=`
+    <div class="result-emoji">${emoji}</div>
+    <div class="result-title">${title}</div>
+    <div class="score-display"><span class="score-num">${score}</span><span class="score-den"> / ${total}</span></div>
+    <div class="stars">${stars}</div>
+    <div class="result-msg">${msg}</div>
+    <div class="best-row">
+      <div class="best-chip"><strong>${score}</strong>Este partido</div>
+      <div class="best-chip"><strong>${best}</strong>Mejor resultado</div>
+      <div class="best-chip"><strong>${Math.round(pct*100)}%</strong>Porcentaje</div>
+    </div>
+    ${breakdownHtml?`<div class="breakdown"><div class="breakdown-title">Desglose</div>${breakdownHtml}</div>`:''}
+    ${reviewHtml}
+    ${saveHtml}
+    ${shareHtml}
+    <div class="result-btns">
+      <button class="btn-retry" onclick="startQuiz('${temaId}')">🔄 Revancha</button>
+      <button class="btn-home" onclick="goHome()">🏠 Ver mis logros</button>
+    </div>`;
+  showScreen('result');
+  if(pct>=0.6)launchConfetti(pct);
+}
+
+// [011] RANKING LOGIC
+function openRanking(){document.getElementById('ranking-overlay').classList.add('open');loadTop10();}
+function closeRanking(){document.getElementById('ranking-overlay').classList.remove('open');}
+function switchRankTab(tab){
+  document.getElementById('tab-top10').classList.toggle('active',tab==='top10');
+  document.getElementById('tab-docente').classList.toggle('active',tab==='docente');
+  document.getElementById('tab-contenido').classList.toggle('active',tab==='contenido');
+  document.getElementById('tab-top10-content').style.display=tab==='top10'?'block':'none';
+  document.getElementById('tab-docente-content').style.display=tab==='docente'?'block':'none';
+  document.getElementById('tab-contenido-content').style.display=tab==='contenido'?'block':'none';
+  if(tab==='top10')loadTop10();
+  if(tab==='docente')renderDocenteLogin();
+  if(tab==='contenido')renderContenidoLogin();
+}
+async function loadTop10(){
+  const el=document.getElementById('tab-top10-content');
+  if(!SCRIPT_URL){
+    // Sin backend: mostramos el mejor puntaje local como "vista previa"
+    const scores=getLocalScores();
+    const entries=Object.entries(scores);
+    if(!entries.length||!currentUser){el.innerHTML='<div class="ranking-empty">🏁 Todavía no hay resultados guardados en este dispositivo. (El ranking en la nube se activa cuando se configure el backend.)</div>';return;}
+    const total=entries.reduce((s,[,v])=>s+v,0);
+    el.innerHTML=`<div class="ranking-empty">📶 Sin backend en la nube todavía.<br>Tu puntaje local: <strong style="color:var(--c2)">${total} pts</strong> en ${entries.length} eje${entries.length!==1?'s':''}.</div>`;
+    return;
+  }
+  el.innerHTML=`<div class="ranking-loading"><div class="rk-spinner"></div><div>Cargando tabla…</div></div>`;
+  try{
+    const data=await apiGet({action:'getRanking'});
+    const ranking=data.ranking||[];
+    if(!ranking.length){el.innerHTML='<div class="ranking-empty">🏁 Todavía no hay resultados. ¡Sé el primero!</div>';return;}
+    const posIcons=['🥇','🥈','🥉'];
+    const posCols=['gold','silver','bronze'];
+    el.innerHTML=`
+      <div style="font-size:.78rem;color:var(--muted);margin-bottom:1rem">Suma de mejores resultados · actualizado en tiempo real</div>
+      <div class="top10-list">
+        ${ranking.map((u,i)=>{
+          const isMe=currentUser&&u.mail===currentUser.mail;
+          return`<div class="top10-item${isMe?' me':''}">
+            <div class="top10-pos ${i<3?posCols[i]:''}">${i<3?posIcons[i]:i+1}</div>
+            <div>
+              <div class="top10-name">${u.nombre}${isMe?' <span style="color:var(--c2);font-size:.7rem">(vos)</span>':''}</div>
+              <div class="top10-sub">${u.temas} eje${u.temas!==1?'s':''} jugado${u.temas!==1?'s':''}</div>
+            </div>
+            <div style="text-align:right"><div class="top10-pts">${u.total} pts</div></div>
+          </div>`;
+        }).join('')}
+      </div>`;
+  }catch(e){el.innerHTML='<div class="ranking-empty">⚠️ No se pudo cargar la tabla.</div>';}
+}
+function renderDocenteLogin(){
+  document.getElementById('tab-docente-content').innerHTML=`
+    <div style="font-size:.85rem;color:var(--muted);margin-bottom:1rem">Ingresá la contraseña docente para ver los datos.</div>
+    <div class="doc-pass-wrap">
+      <input type="password" id="doc-pass" placeholder="Contraseña docente" onkeydown="if(event.key==='Enter')loadDocente()">
+      <button onclick="loadDocente()">Ver →</button>
+    </div>
+    <div id="doc-err" style="color:var(--c5);font-size:.82rem;margin-top:.4rem;display:none">Contraseña incorrecta.</div>`;
+}
+async function loadDocente(){
+  const pass=document.getElementById('doc-pass').value.trim();
+  if(pass!==CLAVE_DOCENTE){renderDocenteLogin();document.getElementById('doc-err').style.display='block';return;}
+  const el=document.getElementById('tab-docente-content');
+  if(!SCRIPT_URL){
+    el.innerHTML=`<div class="ranking-empty">📶 Todavía no hay backend en la nube configurado para Matemática.<br>Mientras tanto, los puntajes quedan solo en el dispositivo de cada alumno/equipo.</div>`;
+    return;
+  }
+  el.innerHTML=`<div class="ranking-loading"><div class="rk-spinner"></div><div>Cargando…</div></div>`;
+  try{
+    const data=await apiGet({action:'getAll',pass});
+    if(data.error){renderDocenteLogin();document.getElementById('doc-err').style.display='block';return;}
+    const puntajes=(data.puntajes||[]).slice(1);
+    const usuarios=(data.usuarios||[]).slice(1);
+    const totalIntentos=puntajes.length;
+    const avgPts=totalIntentos?Math.round(puntajes.reduce((s,r)=>s+Number(r[3]),0)/totalIntentos*10)/10:0;
+    el.innerHTML=`
+      <div class="doc-stat-row">
+        <div class="doc-stat"><strong>${usuarios.length}</strong><span>Registrados</span></div>
+        <div class="doc-stat"><strong>${totalIntentos}</strong><span>Partidos jugados</span></div>
+        <div class="doc-stat"><strong>${avgPts}</strong><span>Prom. pts</span></div>
+      </div>
+      <div class="doc-table-wrap">
+        <table class="doc-table">
+          <thead><tr><th>Equipo/Nombre</th><th>Eje</th><th>Puntaje</th><th>Fecha</th></tr></thead>
+          <tbody>${puntajes.map(r=>`<tr><td><strong>${r[1]}</strong></td><td>${r[2]}</td><td>${r[3]}/${r[4]}</td><td>${r[5]||'—'}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>`;
+  }catch(e){el.innerHTML='<div class="ranking-empty">⚠️ Error al cargar datos.</div>';}
+}
+
+// [011b] PANEL DOCENTE — CONTENIDO (ejes activos + agregar preguntas)
+let contenidoDesbloqueado=false;
+function renderContenidoLogin(){
+  if(contenidoDesbloqueado){renderContenido();return;}
+  document.getElementById('tab-contenido-content').innerHTML=`
+    <div style="font-size:.85rem;color:var(--muted);margin-bottom:1rem">Contraseña docente para agregar material y elegir qué ejes están activos.</div>
+    <div class="doc-pass-wrap">
+      <input type="password" id="cont-pass" placeholder="Contraseña docente" onkeydown="if(event.key==='Enter')unlockContenido()">
+      <button onclick="unlockContenido()">Ver →</button>
+    </div>
+    <div id="cont-err" style="color:var(--c5);font-size:.82rem;margin-top:.4rem;display:none">Contraseña incorrecta.</div>`;
+}
+function unlockContenido(){
+  const pass=document.getElementById('cont-pass').value.trim();
+  if(pass!==CLAVE_DOCENTE){document.getElementById('cont-err').style.display='block';return;}
+  contenidoDesbloqueado=true;
+  renderContenido();
+}
+function renderContenido(){
+  const activos=getEjesActivos();
+  const ejesHtml=Object.entries(MODS).map(([mod,label])=>`
+    <div class="eje-toggle-row">
+      <label>${label}</label>
+      <label class="switch">
+        <input type="checkbox" ${activos[mod]!==false?'checked':''} onchange="setEjeActivo('${mod}',this.checked)">
+        <span class="slider"></span>
+      </label>
+    </div>`).join('');
+
+  const customQs=getCustomQuestions();
+  const listHtml=customQs.length?`
+    <div class="custom-q-list">
+      ${customQs.map((q,i)=>`
+        <div class="custom-q-item">
+          <div><strong>${MODS[q.mod]||q.mod}:</strong> ${q.q}</div>
+          <button onclick="deleteCustomQuestion(${i})">🗑️ Borrar</button>
+        </div>`).join('')}
+    </div>`:'<div style="font-size:.8rem;color:var(--muted);margin-top:.5rem">Todavía no agregaste preguntas propias.</div>';
+
+  document.getElementById('tab-contenido-content').innerHTML=`
+    <div class="docente-section">
+      <h3>🎚️ Ejes activos en el juego</h3>
+      ${ejesHtml}
+      <div style="font-size:.72rem;color:var(--muted);margin-top:.5rem">Si apagás un eje, no aparece en el Home ni entra en la Gran Final. Los alumnos lo ven al instante al recargar la página.</div>
+    </div>
+    <div class="docente-section">
+      <h3>➕ Agregar una pregunta propia</h3>
+      <div class="auth-field"><label>Eje</label>
+        <select id="cq-mod">${Object.entries(MODS).map(([m,l])=>`<option value="${m}">${l}</option>`).join('')}</select>
+      </div>
+      <div class="auth-field"><label>Pista del Búho (contexto)</label><input type="text" id="cq-hint" placeholder="💡 Pensá en..."></div>
+      <div class="auth-field"><label>Pregunta</label><input type="text" id="cq-pregunta" placeholder="¿Cuánto es...?"></div>
+      <div class="auth-field"><label>Opción A</label><input type="text" id="cq-a"></div>
+      <div class="auth-field"><label>Opción B</label><input type="text" id="cq-b"></div>
+      <div class="auth-field"><label>Opción C</label><input type="text" id="cq-c"></div>
+      <div class="auth-field"><label>Opción D</label><input type="text" id="cq-d"></div>
+      <div class="auth-field"><label>¿Cuál es la correcta?</label>
+        <select id="cq-correcta"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select>
+      </div>
+      <button class="auth-btn" onclick="addCustomQuestion()">➕ Agregar al banco</button>
+      <div id="cq-msg" class="auth-msg"></div>
+      <h3 style="margin-top:1.3rem">📋 Preguntas propias agregadas</h3>
+      ${listHtml}
+    </div>
+    <div style="text-align:center;margin-top:1rem">
+      <button onclick="contenidoDesbloqueado=false;renderContenidoLogin();" style="background:var(--card2);border:1px solid var(--border);border-radius:99px;padding:.4rem 1rem;color:var(--muted);font-family:var(--fh);font-size:.75rem;cursor:pointer">🔒 Cerrar sesión docente</button>
+    </div>`;
+}
+function addCustomQuestion(){
+  const mod=document.getElementById('cq-mod').value;
+  const hint=document.getElementById('cq-hint').value.trim()||'💡 Pensalo con calma.';
+  const q=document.getElementById('cq-pregunta').value.trim();
+  const a=document.getElementById('cq-a').value.trim();
+  const b=document.getElementById('cq-b').value.trim();
+  const c=document.getElementById('cq-c').value.trim();
+  const d=document.getElementById('cq-d').value.trim();
+  const ans=Number(document.getElementById('cq-correcta').value);
+  const msgEl=document.getElementById('cq-msg');
+  if(!q||!a||!b||!c||!d){msgEl.textContent='Completá la pregunta y las 4 opciones.';msgEl.className='auth-msg show error';return;}
+  const list=getCustomQuestions();
+  list.push({mod,hint,q,opts:[a,b,c,d],ans});
+  saveCustomQuestions(list);
+  msgEl.textContent='✅ Pregunta agregada. Ya está disponible en el banco del eje correspondiente.';
+  msgEl.className='auth-msg show success';
+  ['cq-hint','cq-pregunta','cq-a','cq-b','cq-c','cq-d'].forEach(id=>document.getElementById(id).value='');
+  renderContenido();
+}
+function deleteCustomQuestion(i){
+  const list=getCustomQuestions();
+  list.splice(i,1);
+  saveCustomQuestions(list);
+  renderContenido();
+}
+
+// ── GUÍA ──
+function openGuia(mod){
+  const g=GUIAS[mod];
+  if(!g)return;
+  document.getElementById('guia-box').innerHTML=`
+    <h2>${g.titulo}</h2>
+    ${g.explicacion.map(p=>`<p style="margin-bottom:.6rem">${p}</p>`).join('')}
+    <h3>✏️ Ejercicios de ejemplo</h3>
+    ${g.ejemplos.map(e=>`<div class="guia-ejemplo">${e}</div>`).join('')}
+    <button class="guia-close" onclick="closeGuia()">Cerrar y volver</button>
+  `;
+  document.getElementById('guia-overlay').classList.add('open');
+}
+function closeGuia(){document.getElementById('guia-overlay').classList.remove('open');}
+
+// [012] PRINT / PDF
+function launchConfetti(pct){
+  const c=document.getElementById('confetti-container');
+  const cols=['#6cace4','#ffd54a','#4ade80','#ffab2e','#ff5a7a','#fff','#ffd700'];
+  const count=pct>=1?220:pct>=0.9?160:pct>=0.75?110:60;
+  for(let i=0;i<count;i++){
+    const el=document.createElement('div');el.className='confetti-piece';
+    const s=Math.random()*10+4;
+    el.style.cssText=`left:${Math.random()*100}%;background:${cols[Math.floor(Math.random()*cols.length)]};width:${s}px;height:${s}px;animation-delay:${Math.random()*2}s;animation-duration:${Math.random()*2+2.5}s;border-radius:${Math.random()>.5?'50%':'2px'};`;
+    c.appendChild(el);
+  }
+  if(pct>=1){
+    setTimeout(()=>{
+      for(let i=0;i<120;i++){
+        const el=document.createElement('div');el.className='confetti-piece';
+        const s=Math.random()*12+5;
+        el.style.cssText=`left:${Math.random()*100}%;background:${cols[Math.floor(Math.random()*cols.length)]};width:${s}px;height:${s}px;animation-delay:${Math.random()*1}s;animation-duration:${Math.random()*2+2}s;border-radius:${Math.random()>.5?'50%':'3px'};`;
+        c.appendChild(el);
+      }
+    },1200);
+  }
+  setTimeout(()=>{c.innerHTML='';},9000);
+}
+
+const LETTERS=['A','B','C','D'];
+function buildPrintContent(def,questions){
+  const bm={};Object.keys(MODS).forEach(m=>{bm[m]=[];});
+  questions.forEach(q=>{if(!bm[q.mod])bm[q.mod]=[];bm[q.mod].push(q);});
+  let qG=0,ak=[],sec='';
+  Object.keys(MODS).forEach(mod=>{
+    const qs=bm[mod];if(!qs||!qs.length)return;
+    let qh='';
+    qs.forEach(q=>{
+      qG++;ak.push({num:qG,letter:LETTERS[q.ans]});
+      const oh=[0,1,2,3].map((oi,di)=>`<div class="pc-opt"><span class="pc-opt-letter">${LETTERS[di]}</span><span>${q.opts[oi]}</span></div>`).join('');
+      qh+=`<div class="pc-q"><div class="pc-q-text"><span class="pc-q-num">${qG}.</span>${q.q}</div><div class="pc-opts">${oh}</div></div>`;
+    });
+    sec+=`<div class="pc-mod-section"><div class="pc-mod-label">${MODS[mod]}</div>${qh}</div>`;
+  });
+  const now=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+  return`<div class="pc-header"><h2>🏆 Mundial Matemático 4° Año · ${def.label}</h2><p>Selección múltiple — marcá la opción correcta</p><div class="pc-meta"><span>📋 ${questions.length} preguntas</span><span>⏱️ 10 min</span><span>📅 ${now}</span><span>👤 Nombre: ___________________________</span></div></div>${sec}<div class="pc-answer-key"><h3>🔑 Clave de respuestas</h3><div class="pc-answers-grid">${ak.map(a=>`<div class="pc-ans-item"><div class="an">${a.num}</div><div class="av">${a.letter}</div></div>`).join('')}</div></div><div class="pc-footer">Mundial Matemático · Generado automáticamente</div>`;
+}
+function openPrint(temaId){
+  const def=temaDefs().find(t=>t.id===temaId);
+  document.getElementById('pm-title').textContent=`${def.icon} ${def.label} — Vista previa`;
+  document.getElementById('pm-body').innerHTML=`<div class="pc-tema-block" style="page-break-after:always">${buildPrintContent(def,buildQuestions(temaId))}</div>`;
+  document.getElementById('print-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function openPrintAll(){
+  document.getElementById('pm-title').textContent='🖨️ Todos los ejes';
+  document.getElementById('pm-body').innerHTML=temaDefs().filter(d=>d.id!=='FINAL').map(def=>`<div class="pc-tema-block" style="page-break-after:always">${buildPrintContent(def,buildQuestions(def.id))}</div>`).join('');
+  document.getElementById('print-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closePrint(){document.getElementById('print-overlay').classList.remove('open');document.body.style.overflow='';}
+
+// [013] NAVEGACIÓN / INIT
+function showScreen(id){
+  ['home','quiz','result'].forEach(s=>{
+    const el=document.getElementById('screen-'+s);
+    if(el)el.classList.toggle('active',s===id);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goHome(){clearInterval(quizTimerInterval);stopMusic();renderHome();showScreen('home');}
+
+loadSavedUser();
+renderHome();
+</script>
+</body>
+</html>
