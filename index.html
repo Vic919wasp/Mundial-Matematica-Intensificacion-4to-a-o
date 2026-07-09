@@ -1,5 +1,5 @@
 <!-- ============================================================
-     CONTEXTO:  Mundial Matemático — 4° Año (primera entrega)
+     CONTEXTO: Mundial Matemático — 4° Año (primera entrega)
      Basado en el Diseño Curricular de Matemática de la DGCyE
      (Provincia de Buenos Aires) para 4° año - Ciclo Superior.
      4 ejes: Números y Operaciones · Álgebra y Estudio de
@@ -48,14 +48,30 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{background:
-  radial-gradient(circle at 15% 0%,rgba(108,172,228,.10),transparent 40%),
-  radial-gradient(circle at 85% 10%,rgba(255,213,74,.08),transparent 35%),
-  var(--bg);
+  radial-gradient(circle at 15% 0%,rgba(108,172,228,.16),transparent 42%),
+  radial-gradient(circle at 85% 8%,rgba(255,213,74,.12),transparent 38%),
+  linear-gradient(180deg,#050d24 0%,#0a1a3a 45%,#0e2547 68%,#123058 100%);
   color:var(--text);font-family:var(--fb);line-height:1.6;min-height:100vh}
 .screen{display:none}.screen.active{display:block}
 a{color:inherit}
 .sun-deco{position:fixed;top:-120px;right:-120px;width:280px;height:280px;border-radius:50%;
   background:radial-gradient(circle,rgba(255,213,74,.18),transparent 70%);pointer-events:none;z-index:0}
+/* ── CANCHA DE FÚTBOL DE FONDO (estilizada, sin fotos reales) ── */
+.stadium-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.stadium-bg .floodlight{position:absolute;top:-10%;width:38vw;height:38vw;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.10),transparent 65%);filter:blur(2px)}
+.stadium-bg .floodlight.l{left:-8%}
+.stadium-bg .floodlight.r{right:-8%}
+.stadium-bg .pitch{position:absolute;left:-8%;right:-8%;bottom:-6vh;height:52vh;
+  background:repeating-linear-gradient(90deg,#1c6a35 0 68px,#20793c 68px 136px);
+  transform:perspective(700px) rotateX(38deg);transform-origin:bottom;
+  box-shadow:0 -40px 80px -20px rgba(5,13,36,.9) inset;opacity:.55}
+.stadium-bg .pitch::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,13,36,.75) 0%,rgba(5,13,36,.1) 55%,rgba(5,13,36,0) 100%)}
+.stadium-bg .halfway{position:absolute;left:6%;right:6%;bottom:22vh;height:2px;background:rgba(255,255,255,.22);
+  transform:perspective(700px) rotateX(38deg);transform-origin:bottom}
+.stadium-bg .centercircle{position:absolute;left:50%;bottom:9vh;width:220px;height:220px;
+  border:3px solid rgba(255,255,255,.2);border-radius:50%;
+  transform:translateX(-50%) perspective(700px) rotateX(38deg)}
 
 .user-topbar{background:var(--surface);border-bottom:2px solid var(--c1);padding:.6rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;position:relative;z-index:2}
 .user-info{display:flex;align-items:center;gap:.6rem;min-width:0}
@@ -294,6 +310,14 @@ input:checked+.slider::before{transform:translateX(18px)}
 @keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}90%{opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
 @keyframes bounceIn{0%{transform:scale(0)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
 #confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden}
+
+/* ── REFUERZO VISUAL POR RESPUESTA ── */
+.answer-flash{position:fixed;top:36%;left:50%;transform:translate(-50%,-50%);font-size:5.5rem;pointer-events:none;z-index:9200;animation:answerFlashAnim .75s ease forwards;text-shadow:0 0 40px currentColor}
+@keyframes answerFlashAnim{0%{opacity:0;transform:translate(-50%,-50%) scale(.25) rotate(-8deg)}30%{opacity:1;transform:translate(-50%,-50%) scale(1.2) rotate(3deg)}65%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0)}100%{opacity:0;transform:translate(-50%,-68%) scale(.92)}}
+.q-card.pulse-ok{animation:pulseOk .6s ease}
+.q-card.pulse-ko{animation:pulseKo .5s ease}
+@keyframes pulseOk{0%{box-shadow:0 0 0 0 rgba(74,222,128,.65)}70%{box-shadow:0 0 0 22px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
+@keyframes pulseKo{0%{box-shadow:0 0 0 0 rgba(255,90,122,.6)}0%,20%,40%{transform:translateX(0)}10%,30%{transform:translateX(-6px)}20%{transform:translateX(6px)}70%{box-shadow:0 0 0 18px rgba(255,90,122,0)}100%{box-shadow:0 0 0 0 rgba(255,90,122,0);transform:translateX(0)}}
 @keyframes slideUpBuho{from{transform:translateY(80px);opacity:0}to{transform:translateY(0);opacity:1}}
 @keyframes buhoEntrada{from{transform:translateY(60px) scale(.8);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
 @keyframes buhoFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-6px) rotate(3deg)}}
@@ -413,12 +437,55 @@ input:checked+.slider::before{transform:translateX(18px)}
 .chat-ticker::-webkit-scrollbar{display:none}
 .chat-ticker-chip{flex-shrink:0;scroll-snap-align:start;background:var(--card);border:1.5px solid var(--border);border-radius:99px;padding:.3rem .7rem;font-size:.72rem;display:flex;align-items:center;gap:.4rem;white-space:nowrap}
 .chat-ticker-chip .ctc-name{font-weight:700;font-family:var(--fh);font-size:.66rem}
+
+/* ── AVISO / TUTORIAL INICIAL ── */
+.tutorial-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9800;align-items:center;justify-content:center;padding:1.5rem;backdrop-filter:blur(8px)}
+.tutorial-overlay.open{display:flex}
+.tutorial-box{background:var(--card);border:2px solid var(--c2);border-radius:20px;padding:2rem 1.75rem 1.75rem;max-width:480px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.6);position:relative;text-align:center}
+.tutorial-x{position:absolute;top:.9rem;right:.9rem;background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:50%;width:32px;height:32px;color:var(--text);cursor:pointer;font-size:.95rem}
+.tutorial-emoji{font-size:2.4rem;margin-bottom:.5rem}
+.tutorial-box h2{font-family:var(--fh);font-size:1.25rem;font-weight:800;margin-bottom:1.2rem;line-height:1.3}
+.tutorial-steps{text-align:left;display:flex;flex-direction:column;gap:.85rem;margin-bottom:1.4rem}
+.tutorial-step{display:flex;align-items:flex-start;gap:.7rem;font-size:.86rem;color:#c8d3f0;line-height:1.5}
+.ts-num{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--c1),var(--c2));color:#0a1128;font-family:var(--fh);font-weight:800;font-size:.78rem;display:flex;align-items:center;justify-content:center;margin-top:.1rem}
+.tutorial-btn{background:linear-gradient(135deg,var(--c1),var(--c2));border:none;border-radius:99px;padding:.8rem 2rem;color:#0a1128;font-family:var(--fh);font-weight:800;font-size:.92rem;cursor:pointer;transition:opacity .2s}
+.tutorial-btn:hover{opacity:.88}
+@media(max-width:480px){
+  .tutorial-box{padding:1.5rem 1.2rem 1.4rem}
+  .tutorial-box h2{font-size:1.1rem}
+  .tutorial-step{font-size:.82rem}
+}
 </style>
 </head>
 <body>
 
 <!-- [003] HTML — PANTALLAS -->
 <div class="sun-deco"></div>
+<div class="stadium-bg" aria-hidden="true">
+  <div class="floodlight l"></div>
+  <div class="floodlight r"></div>
+  <div class="pitch"></div>
+  <div class="halfway"></div>
+  <div class="centercircle"></div>
+</div>
+
+<!-- AVISO / TUTORIAL INICIAL -->
+<div class="tutorial-overlay" id="tutorial-overlay">
+  <div class="tutorial-box">
+    <button class="tutorial-x" onclick="closeTutorial()" title="Cerrar">✕</button>
+    <div class="tutorial-emoji">🏆⚽📐</div>
+    <h2>¿Cómo funciona el Mundial Matemático?</h2>
+    <div class="tutorial-steps">
+      <div class="tutorial-step"><span class="ts-num">1</span><span>Elegí un <strong>eje</strong> (Fecha) y mirá su <strong>📖 Guía</strong> si querés repasar antes de jugar.</span></div>
+      <div class="tutorial-step"><span class="ts-num">2</span><span>Anotate como <strong>jugador individual o en equipo</strong> — solo un apodo de hasta 8 caracteres, sin contraseña.</span></div>
+      <div class="tutorial-step"><span class="ts-num">3</span><span>Jugás <strong>10 preguntas</strong> con hasta <strong>10 minutos</strong> de reloj. El 🦉 <strong>Búho Sabio</strong> te da una pista en cada pregunta — podés arrastrarlo.</span></div>
+      <div class="tutorial-step"><span class="ts-num">4</span><span>Mirá la <strong>🏆 Tabla de posiciones</strong>, tus <strong>🏅 Logros</strong> y chateá con el resto en el <strong>💬 Tablón de mensajes</strong>.</span></div>
+      <div class="tutorial-step"><span class="ts-num">5</span><span>Al terminar, podés <strong>compartir tu resultado</strong> por WhatsApp o Mail (¡o Delta Chat!).</span></div>
+    </div>
+    <button class="tutorial-btn" onclick="closeTutorial()">¡Entendido, a jugar! ⚽</button>
+  </div>
+</div>
+
 <div id="confetti-container"></div>
 
 <div class="user-topbar" id="user-topbar">
@@ -491,14 +558,14 @@ input:checked+.slider::before{transform:translateX(18px)}
       <button class="auth-tab" id="tab-equipo" onclick="switchAuthTab('equipo')">👥 Equipo</button>
     </div>
     <div id="form-individual">
-      <div class="auth-field"><label>Nombre y apellido</label><input type="text" id="ind-nombre" placeholder="Ej: Lionel Messi"></div>
+      <div class="auth-field"><label>Apodo (máx. 8 caracteres)</label><input type="text" id="ind-nombre" maxlength="8" placeholder="Ej: Leo10"></div>
     </div>
     <div id="form-equipo" style="display:none">
       <div class="auth-field"><label>Nombre del equipo</label><input type="text" id="eq-nombre" placeholder="Ej: Los Albicelestes"></div>
       <div class="auth-field">
-        <label>Integrantes (nombre y apellido)</label>
-        <textarea id="eq-integrantes" rows="3" placeholder="Un integrante por línea:&#10;Ana Pérez&#10;Juan Gómez"></textarea>
-        <div class="auth-hint">Escribí nombre y apellido de cada integrante, uno por renglón.</div>
+        <label>Integrantes (apodo, máx. 8 caracteres cada uno)</label>
+        <textarea id="eq-integrantes" rows="3" placeholder="Un apodo por línea:&#10;Ana&#10;Juanchi"></textarea>
+        <div class="auth-hint">Escribí un apodo de hasta 8 caracteres por integrante, uno por renglón.</div>
       </div>
     </div>
     <button class="auth-btn" id="btn-start" onclick="doStartTeam()">⚽ ¡A jugar! →</button>
@@ -591,56 +658,102 @@ const MODS={
 };
 
 const BANK_BUILTIN=[
-// ── m1: NÚMEROS Y OPERACIONES ────────────────────────────────
-{mod:'m1',hint:'💡 Los reales incluyen a los racionales (se pueden escribir como fracción) y a los irracionales (no).',q:'¿Cuál de estos números NO es racional?',opts:['3/4','√2','0,75','-5'],ans:1},
-{mod:'m1',hint:'💡 Un número racional se puede escribir como fracción de dos enteros. π y √2 no se pueden.',q:'¿Qué caracteriza a un número irracional?',opts:['Que es negativo','Que no se puede expresar como fracción de dos enteros','Que es siempre mayor que 1','Que no tiene decimales'],ans:1},
-{mod:'m1',hint:'💡 Recordá la propiedad: raíz de un producto es producto de raíces (si los índices son iguales).',q:'¿Cuál es el resultado de √8 · √2?',opts:['√16 = 4','√10','16','2√2'],ans:0},
-{mod:'m1',hint:'💡 Para sumar o restar radicales, deben tener el mismo índice y el mismo radicando.',q:'¿Cuándo se pueden sumar dos radicales directamente?',opts:['Siempre que ambos sean números positivos','Cuando tienen el mismo índice y el mismo radicando','Cuando ambos son racionales','Nunca se pueden sumar'],ans:1},
-{mod:'m1',hint:'💡 La notación científica se escribe como a × 10ⁿ, con 1 ≤ a < 10.',q:'¿Cuál es la notación científica de 45.000?',opts:['45 × 10³','4,5 × 10⁴','0,45 × 10⁵','4,5 × 10³'],ans:1},
-{mod:'m1',hint:'💡 Una potencia con exponente negativo equivale al inverso de la base elevada al exponente positivo.',q:'¿A qué es igual 2⁻³?',opts:['-8','1/8','8','-1/8'],ans:1},
-{mod:'m1',hint:'💡 Elevar una potencia a otra potencia: se multiplican los exponentes.',q:'¿Cuál es el resultado de (2³)²?',opts:['2⁵','2⁶','2⁹','2¹'],ans:1},
-{mod:'m1',hint:'💡 Todo número real, racional o irracional, tiene un lugar único en la recta numérica.',q:'¿En qué se diferencia principalmente el conjunto de los números reales R de los racionales Q?',opts:['R incluye además a los irracionales, como √2 o π','R solo contiene números negativos','Q incluye a R','No hay diferencia, son el mismo conjunto'],ans:0},
-{mod:'m1',hint:'💡 Para racionalizar un denominador con raíz cuadrada, se multiplica arriba y abajo por esa misma raíz.',q:'¿Para qué sirve racionalizar el denominador de una fracción con radicales?',opts:['Para que el numerador sea negativo','Para eliminar la raíz del denominador y simplificar la expresión','Para que el resultado sea siempre un número entero','No tiene ninguna utilidad práctica'],ans:1},
-{mod:'m1',hint:'💡 Todo número elevado a exponente 0 (distinto de 0) da como resultado 1.',q:'¿Cuánto vale 5⁰?',opts:['0','1','5','Indefinido'],ans:1},
-{mod:'m1',hint:'💡 La raíz cuadrada de un número negativo no tiene solución dentro de los números reales.',q:'¿Por qué √-4 no tiene solución en los números reales?',opts:['Porque -4 es muy chico','Porque ningún número real elevado al cuadrado da un resultado negativo','Porque 4 no es un cuadrado perfecto','Porque las raíces cuadradas siempre son positivas'],ans:1},
-{mod:'m1',hint:'💡 Multiplicar potencias de igual base: se suman los exponentes.',q:'¿Cuál es el resultado de 3² · 3⁴?',opts:['3⁶','3⁸','9⁶','3²'],ans:0},
-// ── m2: ÁLGEBRA Y ESTUDIO DE FUNCIONES ───────────────────────
-{mod:'m2',hint:'💡 En y = mx + b, "m" indica la inclinación de la recta y "b" dónde corta al eje y.',q:'En la función lineal y = mx + b, ¿qué representa "m"?',opts:['La ordenada al origen','La pendiente de la recta','El punto donde corta al eje x','El vértice de la recta'],ans:1},
-{mod:'m2',hint:'💡 La ordenada al origen es el valor de "y" cuando x = 0, es decir, dónde la recta cruza ese eje.',q:'En y = mx + b, ¿qué representa "b"?',opts:['La pendiente','El punto donde la recta corta al eje y (x=0)','El coeficiente cuadrático','La raíz de la función'],ans:1},
-{mod:'m2',hint:'💡 Si la pendiente es positiva, la recta sube de izquierda a derecha (crece); si es negativa, baja.',q:'Si la pendiente "m" de una función lineal es negativa, la función es…',opts:['Creciente','Constante','Decreciente','No se puede saber'],ans:2},
-{mod:'m2',hint:'💡 Dos rectas son paralelas cuando tienen exactamente la misma pendiente.',q:'¿Cuándo dos rectas son paralelas?',opts:['Cuando tienen distinta ordenada al origen','Cuando tienen la misma pendiente','Cuando se cortan en un punto','Cuando ambas pasan por el origen'],ans:1},
-{mod:'m2',hint:'💡 Dos rectas son perpendiculares cuando el producto de sus pendientes da -1.',q:'¿Cuándo dos rectas son perpendiculares?',opts:['Cuando tienen la misma pendiente','Cuando el producto de sus pendientes es igual a -1','Cuando ambas tienen pendiente 0','Cuando no se cortan nunca'],ans:1},
-{mod:'m2',hint:'💡 La gráfica de una función cuadrática siempre es una parábola.',q:'¿Qué tipo de gráfica tiene una función cuadrática f(x) = ax² + bx + c?',opts:['Una recta','Una parábola','Una circunferencia','Una hipérbola'],ans:1},
-{mod:'m2',hint:'💡 La parábola es simétrica respecto de una recta vertical que pasa justo por su punto más alto o más bajo.',q:'¿Qué es el eje de simetría de una parábola?',opts:['La recta vertical que pasa por el vértice y divide a la parábola en dos mitades iguales','El punto más alto de la parábola','La intersección con el eje x','El coeficiente principal de la función'],ans:0},
-{mod:'m2',hint:'💡 Es el punto más bajo (si la parábola abre hacia arriba) o más alto (si abre hacia abajo).',q:'¿Qué es el vértice de una parábola?',opts:['El punto donde la parábola corta al eje x','El punto máximo o mínimo de la función cuadrática','La pendiente de la función','El coeficiente independiente'],ans:1},
-{mod:'m2',hint:'💡 Es la fórmula que permite calcular las raíces de cualquier ecuación cuadrática ax²+bx+c=0.',q:'¿Para qué se usa la fórmula resolvente en una función cuadrática?',opts:['Para calcular la pendiente','Para encontrar las raíces (ceros) de la función cuadrática','Para calcular el dominio de la función','Para graficar una recta'],ans:1},
-{mod:'m2',hint:'💡 Si el coeficiente principal "a" es positivo, la parábola abre hacia arriba (tiene un mínimo).',q:'Si en f(x) = ax² + bx + c el coeficiente "a" es positivo, la parábola…',opts:['Abre hacia abajo y tiene un máximo','Abre hacia arriba y tiene un mínimo','Es una recta','No tiene vértice'],ans:1},
-{mod:'m2',hint:'💡 La Regla de Ruffini permite dividir un polinomio por (x - a) de forma rápida.',q:'¿Para qué se utiliza la Regla de Ruffini?',opts:['Para sumar dos polinomios','Para dividir un polinomio por un binomio de la forma (x - a)','Para graficar funciones lineales','Para calcular la pendiente de una recta'],ans:1},
-{mod:'m2',hint:'💡 El Teorema del Resto dice que el resto de dividir P(x) por (x-a) es igual a P(a).',q:'Según el Teorema del Resto, ¿cómo se calcula el resto de dividir un polinomio P(x) por (x-a)?',opts:['Sumando todos los coeficientes de P(x)','Evaluando P(x) en x=a, es decir, calculando P(a)','Dividiendo el grado de P(x) por a','Multiplicando P(x) por a'],ans:1},
-{mod:'m2',hint:'💡 El Teorema de Gauss ayuda a encontrar las posibles raíces racionales de un polinomio con coeficientes enteros.',q:'¿Para qué sirve el Teorema de Gauss en el estudio de polinomios?',opts:['Para graficar la función directamente','Para hallar posibles raíces racionales de un polinomio con coeficientes enteros','Para sumar dos funciones cuadráticas','Para calcular el vértice de una parábola'],ans:1},
-{mod:'m2',hint:'💡 Una raíz de multiplicidad 2 significa que ese factor (x-a) aparece dos veces en la factorización.',q:'¿Qué significa que una raíz de un polinomio tenga "multiplicidad 2"?',opts:['Que la raíz vale 2','Que el factor correspondiente a esa raíz se repite dos veces en la factorización','Que hay dos raíces distintas','Que el polinomio tiene grado 2'],ans:1},
-// ── m3: GEOMETRÍA Y MAGNITUDES (TRIGONOMETRÍA) ───────────────
-{mod:'m3',hint:'💡 En un triángulo rectángulo, seno = cateto opuesto sobre hipotenusa.',q:'En un triángulo rectángulo, ¿cómo se calcula el seno de un ángulo agudo?',opts:['Cateto opuesto sobre hipotenusa','Cateto adyacente sobre hipotenusa','Cateto opuesto sobre cateto adyacente','Hipotenusa sobre cateto opuesto'],ans:0},
-{mod:'m3',hint:'💡 Coseno = cateto adyacente sobre hipotenusa.',q:'En un triángulo rectángulo, ¿cómo se calcula el coseno de un ángulo agudo?',opts:['Cateto opuesto sobre hipotenusa','Cateto adyacente sobre hipotenusa','Cateto opuesto sobre cateto adyacente','Hipotenusa sobre cateto adyacente'],ans:1},
-{mod:'m3',hint:'💡 Tangente = cateto opuesto sobre cateto adyacente (también seno sobre coseno).',q:'¿Cómo se calcula la tangente de un ángulo agudo en un triángulo rectángulo?',opts:['Cateto opuesto sobre hipotenusa','Cateto adyacente sobre hipotenusa','Cateto opuesto sobre cateto adyacente','Hipotenusa sobre cateto opuesto'],ans:2},
-{mod:'m3',hint:'💡 El Teorema de Pitágoras relaciona los tres lados de un triángulo rectángulo: a² + b² = c².',q:'¿Qué establece el Teorema de Pitágoras?',opts:['La suma de los ángulos internos es 180°','En un triángulo rectángulo, la suma de los cuadrados de los catetos es igual al cuadrado de la hipotenusa','El área de un triángulo es base por altura sobre dos','Todos los triángulos son semejantes'],ans:1},
-{mod:'m3',hint:'💡 Dos triángulos son semejantes si tienen la misma forma (ángulos iguales) aunque sean de distinto tamaño.',q:'¿Cuándo dos triángulos son semejantes?',opts:['Cuando tienen exactamente el mismo tamaño','Cuando tienen sus ángulos correspondientes iguales y sus lados proporcionales','Cuando son ambos rectángulos','Cuando tienen la misma área'],ans:1},
-{mod:'m3',hint:'💡 El Teorema del Seno se usa en triángulos que no son rectángulos, relacionando lados y ángulos opuestos.',q:'¿Para qué se usa el Teorema del Seno?',opts:['Solo para triángulos rectángulos','Para resolver triángulos oblicuángulos (no rectángulos), relacionando lados y ángulos opuestos','Para calcular áreas de círculos','Para sumar ángulos internos'],ans:1},
-{mod:'m3',hint:'💡 El Teorema del Coseno generaliza el Teorema de Pitágoras para cualquier triángulo.',q:'¿Qué relación generaliza el Teorema del Coseno?',opts:['El Teorema de Pitágoras, aplicándolo a cualquier triángulo (no solo rectángulos)','La suma de ángulos internos','El área de un triángulo','La semejanza de triángulos'],ans:0},
-{mod:'m3',hint:'💡 Los ángulos internos de cualquier triángulo siempre suman 180°.',q:'¿Cuánto suman los ángulos internos de cualquier triángulo?',opts:['90°','180°','270°','360°'],ans:1},
-{mod:'m3',hint:'💡 La hipotenusa es siempre el lado más largo, opuesto al ángulo recto (90°).',q:'En un triángulo rectángulo, ¿qué es la hipotenusa?',opts:['El lado más corto','El lado opuesto al ángulo recto, siempre el más largo','Uno de los catetos','La altura del triángulo'],ans:1},
-{mod:'m3',hint:'💡 Un ángulo de 90° se llama recto; los triángulos que lo tienen se llaman rectángulos.',q:'¿Cómo se llama un ángulo de exactamente 90°?',opts:['Agudo','Obtuso','Recto','Llano'],ans:2},
-// ── m4: PROBABILIDAD Y ESTADÍSTICA ───────────────────────────
-{mod:'m4',hint:'💡 Si dos sucesos no pueden ocurrir al mismo tiempo, son mutuamente excluyentes.',q:'¿Qué significa que dos sucesos sean "mutuamente excluyentes"?',opts:['Que ambos pueden ocurrir juntos','Que no pueden ocurrir al mismo tiempo','Que tienen la misma probabilidad','Que son sucesos independientes'],ans:1},
-{mod:'m4',hint:'💡 Dos sucesos son independientes cuando que ocurra uno no cambia la probabilidad del otro.',q:'¿Qué significa que dos sucesos sean "independientes"?',opts:['Que no pueden ocurrir nunca juntos','Que la ocurrencia de uno no afecta la probabilidad del otro','Que tienen probabilidad 0','Que siempre ocurren juntos'],ans:1},
-{mod:'m4',hint:'💡 La probabilidad condicional es la probabilidad de un suceso, sabiendo que otro ya ocurrió.',q:'¿Qué es la probabilidad condicional?',opts:['La probabilidad de un suceso imposible','La probabilidad de que ocurra un suceso, dado que otro ya ocurrió','La probabilidad de dos sucesos mutuamente excluyentes','La suma de todas las probabilidades posibles'],ans:1},
-{mod:'m4',hint:'💡 Para sucesos independientes, la probabilidad compuesta es el producto de las probabilidades individuales.',q:'¿Cómo se calcula la probabilidad de que ocurran dos sucesos independientes a la vez?',opts:['Sumando sus probabilidades','Multiplicando sus probabilidades individuales','Restando sus probabilidades','Dividiendo una probabilidad por la otra'],ans:1},
-{mod:'m4',hint:'💡 La varianza mide qué tan dispersos están los datos respecto de la media (promedio).',q:'¿Qué mide la varianza en estadística?',opts:['El valor máximo de un conjunto de datos','Qué tan dispersos están los datos respecto de la media','La cantidad total de datos','El valor que más se repite'],ans:1},
-{mod:'m4',hint:'💡 El desvío estándar es la raíz cuadrada de la varianza, y se expresa en las mismas unidades que los datos.',q:'¿Cómo se relaciona el desvío estándar con la varianza?',opts:['Son exactamente lo mismo','El desvío estándar es la raíz cuadrada de la varianza','La varianza es la raíz cuadrada del desvío estándar','No tienen ninguna relación'],ans:1},
-{mod:'m4',hint:'💡 La probabilidad de un suceso siempre está entre 0 (imposible) y 1 (seguro).',q:'¿Entre qué valores se encuentra siempre la probabilidad de un suceso?',opts:['Entre -1 y 1','Entre 0 y 1','Entre 0 y 100','Entre 1 y 10'],ans:1},
-{mod:'m4',hint:'💡 La media (promedio) se calcula sumando todos los valores y dividiendo por la cantidad de datos.',q:'¿Cómo se calcula la media aritmética de un conjunto de datos?',opts:['Se toma el valor del medio','Se suman todos los valores y se dividen por la cantidad de datos','Se resta el mayor menos el menor','Se multiplican todos los valores'],ans:1},
-{mod:'m4',hint:'💡 La probabilidad clásica se calcula como casos favorables sobre casos posibles.',q:'¿Cómo se calcula la probabilidad clásica de un suceso?',opts:['Casos posibles sobre casos favorables','Casos favorables sobre casos posibles','Casos favorables más casos posibles','Casos posibles menos casos favorables'],ans:1},
+// ── m1: NÚMEROS Y OPERACIONES (24) ─────────────────────────────
+{mod:'m1',hint:'💡 Pensá si cada número se puede escribir como fracción de dos números enteros.',q:'¿Cuál de estos números NO es racional?',opts:['3/4','√2','0,75','-5'],ans:1},
+{mod:'m1',hint:'💡 Pensá en qué NO podés hacer con este tipo de número que sí podés hacer con un racional.',q:'¿Qué caracteriza a un número irracional?',opts:['Que es negativo','Que no se puede expresar como fracción de dos enteros','Que es siempre mayor que 1','Que no tiene decimales'],ans:1},
+{mod:'m1',hint:'💡 Hay una propiedad para multiplicar raíces del mismo índice: ¿en qué se convierte el producto de los radicandos?',q:'¿Cuál es el resultado de √8 · √2?',opts:['√16 = 4','√10','16','2√2'],ans:0},
+{mod:'m1',hint:'💡 Pensá qué dos características de un radical tienen que coincidir para poder sumarlo con otro, como si fueran términos semejantes.',q:'¿Cuándo se pueden sumar dos radicales directamente?',opts:['Siempre que ambos sean números positivos','Cuando tienen el mismo índice y el mismo radicando','Cuando ambos son racionales','Nunca se pueden sumar'],ans:1},
+{mod:'m1',hint:'💡 Contá cuántos lugares tenés que correr la coma para que quede un solo dígito antes de ella.',q:'¿Cuál es la notación científica de 45.000?',opts:['45 × 10³','4,5 × 10⁴','0,45 × 10⁵','4,5 × 10³'],ans:1},
+{mod:'m1',hint:'💡 Un exponente negativo te dice que hay que invertir la base. ¿Qué pasa después con el exponente positivo?',q:'¿A qué es igual 2⁻³?',opts:['-8','1/8','8','-1/8'],ans:1},
+{mod:'m1',hint:'💡 Cuando una potencia está elevada a otra potencia, hay una operación entre los exponentes. ¿Cuál es?',q:'¿Cuál es el resultado de (2³)²?',opts:['2⁵','2⁶','2⁹','2¹'],ans:1},
+{mod:'m1',hint:'💡 Pensá qué tipo de números hay en R que no entran dentro de Q.',q:'¿En qué se diferencia principalmente el conjunto de los números reales R de los racionales Q?',opts:['R incluye además a los irracionales, como √2 o π','R solo contiene números negativos','Q incluye a R','No hay diferencia, son el mismo conjunto'],ans:0},
+{mod:'m1',hint:'💡 Pensá qué "molesta" tener en el denominador de una fracción, y qué operación se hace para sacarlo de ahí.',q:'¿Para qué sirve racionalizar el denominador de una fracción con radicales?',opts:['Para que el numerador sea negativo','Para eliminar la raíz del denominador y simplificar la expresión','Para que el resultado sea siempre un número entero','No tiene ninguna utilidad práctica'],ans:1},
+{mod:'m1',hint:'💡 Pensá qué pasa si dividís una potencia por sí misma, restando sus exponentes. ¿Qué exponente te queda?',q:'¿Cuánto vale 5⁰?',opts:['0','1','5','Indefinido'],ans:1},
+{mod:'m1',hint:'💡 Pensá qué signo da siempre el cuadrado de cualquier número real, sea positivo o negativo.',q:'¿Por qué √-4 no tiene solución en los números reales?',opts:['Porque -4 es muy chico','Porque ningún número real elevado al cuadrado da un resultado negativo','Porque 4 no es un cuadrado perfecto','Porque las raíces cuadradas siempre son positivas'],ans:1},
+{mod:'m1',hint:'💡 Al multiplicar potencias de igual base hay una operación entre los exponentes distinta a la de "potencia de potencia". ¿Cuál?',q:'¿Cuál es el resultado de 3² · 3⁴?',opts:['3⁶','3⁸','9⁶','3²'],ans:0},
+{mod:'m1',hint:'💡 Hay una propiedad que dice que la potencia de un producto es igual al producto de las potencias. Aplicala a cada factor.',q:'¿Cuál es el resultado de (2·3)²?',opts:['36','12','6','18'],ans:0},
+{mod:'m1',hint:'💡 Cuando el número es menor que 1, el exponente de la potencia de 10 es negativo. Contá cuántos lugares corrés la coma.',q:'¿Cómo se escribe 0,00034 en notación científica?',opts:['3,4×10⁻⁴','34×10⁻⁵','3,4×10⁴','0,34×10⁻³'],ans:0},
+{mod:'m1',hint:'💡 Pensá en la recta numérica: ¿qué mide esta magnitud, sin importar para qué lado esté el número?',q:'¿Qué representa el valor absoluto de un número real?',opts:['Su distancia al cero en la recta numérica','Siempre su valor negativo','El doble de ese número','Su inverso multiplicativo'],ans:0},
+{mod:'m1',hint:'💡 Un exponente -1 significa invertir la base completa (ya calculada). ¿Qué número queda arriba y cuál abajo?',q:'¿Cuál es el resultado de (10³)⁻¹?',opts:['1/1000','1000','-1000','10⁻³ ×10'],ans:0},
+{mod:'m1',hint:'💡 Dos números son inversos multiplicativos si al multiplicarlos entre sí el resultado da 1. Probá multiplicarlos.',q:'¿Cuál de estos pares de números NO son inversos multiplicativos?',opts:['2 y 1/2','3 y 1/3','5 y -5','4 y 1/4'],ans:2},
+{mod:'m1',hint:'💡 Recordá el valor aproximado de esta constante con dos cifras decimales y ubicalo entre los enteros más cercanos.',q:'En la recta numérica, ¿dónde se ubica π aproximadamente?',opts:['Entre 3 y 4','Entre 2 y 3','Entre 4 y 5','Entre 1 y 2'],ans:0},
+{mod:'m1',hint:'💡 Pensá en el proceso inverso al que usás para escribir un número grande en notación científica.',q:'¿Qué operación hay que hacer para pasar de notación científica a número decimal "normal"?',opts:['Correr la coma tantos lugares como indique el exponente de la potencia de 10','Sumar el exponente al número','Multiplicar el número por 10 una sola vez','Restar 1 al exponente'],ans:0},
+{mod:'m1',hint:'💡 La raíz de una fracción se puede calcular aplicando la raíz por separado al numerador y al denominador.',q:'¿Cuál es el resultado de √(4/9)?',opts:['2/3','4/3','2/9','4/9'],ans:0},
+{mod:'m1',hint:'💡 Calculá primero el valor de la potencia de referencia, y después verificá cuál opción NO da ese mismo resultado.',q:'¿Cuál de estas expresiones NO es equivalente a 2³?',opts:['2²·2','2⁴÷2','2·4','2·2·3'],ans:3},
+{mod:'m1',hint:'💡 Dividí el numerador entre el denominador y fijate si el resultado decimal termina o se repite indefinidamente.',q:'¿Qué tipo de número es 7/3 en su forma decimal?',opts:['Un decimal periódico','Un decimal exacto','Un número irracional','Un número entero'],ans:0},
+{mod:'m1',hint:'💡 Para elevar una fracción al cuadrado, elevá numerador y denominador por separado.',q:'¿Cuál es el resultado de (3/4)²?',opts:['9/16','6/8','3/8','9/8'],ans:0},
+{mod:'m1',hint:'💡 Pensá en qué parte de a×10ⁿ te da una idea rápida de qué tan grande o chico es el número.',q:'¿Qué representa el orden de magnitud de un número escrito en notación científica?',opts:['El exponente de la potencia de 10','El primer dígito del número','La cantidad total de cifras','El signo del número'],ans:0},
+// ── m2: ÁLGEBRA Y ESTUDIO DE FUNCIONES (28) ───────────────────────────
+{mod:'m2',hint:'💡 Pensá qué parte de la fórmula te dice si la recta sube, baja, o qué tan inclinada está.',q:'En la función lineal y = mx + b, ¿qué representa "m"?',opts:['La ordenada al origen','La pendiente de la recta','El punto donde corta al eje x','El vértice de la recta'],ans:1},
+{mod:'m2',hint:'💡 Pensá qué pasa con la fórmula y=mx+b cuando reemplazás x por 0. ¿Qué valor de y obtenés?',q:'En y = mx + b, ¿qué representa "b"?',opts:['La pendiente','El punto donde la recta corta al eje y (x=0)','El coeficiente cuadrático','La raíz de la función'],ans:1},
+{mod:'m2',hint:'💡 Pensá en cómo se ve una recta que "baja" de izquierda a derecha en un gráfico. ¿Qué signo tendría su pendiente?',q:'Si la pendiente "m" de una función lineal es negativa, la función es…',opts:['Creciente','Constante','Decreciente','No se puede saber'],ans:2},
+{mod:'m2',hint:'💡 Pensá en dos rectas que nunca se cruzan. ¿Qué tienen que tener en común para mantener siempre la misma distancia entre sí?',q:'¿Cuándo dos rectas son paralelas?',opts:['Cuando tienen distinta ordenada al origen','Cuando tienen la misma pendiente','Cuando se cortan en un punto','Cuando ambas pasan por el origen'],ans:1},
+{mod:'m2',hint:'💡 Pensá en dos rectas que forman un ángulo de 90°. Hay una relación numérica particular entre sus pendientes.',q:'¿Cuándo dos rectas son perpendiculares?',opts:['Cuando tienen la misma pendiente','Cuando el producto de sus pendientes es igual a -1','Cuando ambas tienen pendiente 0','Cuando no se cortan nunca'],ans:1},
+{mod:'m2',hint:'💡 Pensá en la forma que tiene la trayectoria de una pelota lanzada al aire. ¿Qué figura geométrica dibuja?',q:'¿Qué tipo de gráfica tiene una función cuadrática f(x) = ax² + bx + c?',opts:['Una recta','Una parábola','Una circunferencia','Una hipérbola'],ans:1},
+{mod:'m2',hint:'💡 Pensá en una parábola doblada por la mitad como un espejo. ¿Qué tipo de recta la parte en dos mitades iguales?',q:'¿Qué es el eje de simetría de una parábola?',opts:['La recta vertical que pasa por el vértice y divide a la parábola en dos mitades iguales','El punto más alto de la parábola','La intersección con el eje x','El coeficiente principal de la función'],ans:0},
+{mod:'m2',hint:'💡 Pensá en el punto más alto o más bajo de la parábola, según hacia dónde abra.',q:'¿Qué es el vértice de una parábola?',opts:['El punto donde la parábola corta al eje x','El punto máximo o mínimo de la función cuadrática','La pendiente de la función','El coeficiente independiente'],ans:1},
+{mod:'m2',hint:'💡 Pensá qué necesitás calcular cuando una función cuadrática corta al eje x. ¿Para qué sirve esa fórmula tan larga?',q:'¿Para qué se usa la fórmula resolvente en una función cuadrática?',opts:['Para calcular la pendiente','Para encontrar las raíces (ceros) de la función cuadrática','Para calcular el dominio de la función','Para graficar una recta'],ans:1},
+{mod:'m2',hint:'💡 Pensá en el signo del coeficiente principal como una "sonrisa" o una "carita triste". ¿Hacia dónde abre según el signo?',q:'Si en f(x) = ax² + bx + c el coeficiente "a" es positivo, la parábola…',opts:['Abre hacia abajo y tiene un máximo','Abre hacia arriba y tiene un mínimo','Es una recta','No tiene vértice'],ans:1},
+{mod:'m2',hint:'💡 Pensá en un método rápido para dividir un polinomio, que funciona cuando el divisor tiene una forma particular de grado 1.',q:'¿Para qué se utiliza la Regla de Ruffini?',opts:['Para sumar dos polinomios','Para dividir un polinomio por un binomio de la forma (x - a)','Para graficar funciones lineales','Para calcular la pendiente de una recta'],ans:1},
+{mod:'m2',hint:'💡 Pensá que no hace falta hacer toda la división: alcanza con reemplazar la variable por un valor puntual del polinomio.',q:'Según el Teorema del Resto, ¿cómo se calcula el resto de dividir un polinomio P(x) por (x-a)?',opts:['Sumando todos los coeficientes de P(x)','Evaluando P(x) en x=a, es decir, calculando P(a)','Dividiendo el grado de P(x) por a','Multiplicando P(x) por a'],ans:1},
+{mod:'m2',hint:'💡 Pensá en una herramienta que te da una lista de "candidatos" a probar antes de encontrar las raíces reales de un polinomio.',q:'¿Para qué sirve el Teorema de Gauss en el estudio de polinomios?',opts:['Para graficar la función directamente','Para hallar posibles raíces racionales de un polinomio con coeficientes enteros','Para sumar dos funciones cuadráticas','Para calcular el vértice de una parábola'],ans:1},
+{mod:'m2',hint:'💡 Pensá qué significa que, al factorizar completamente el polinomio, un mismo factor (x-a) aparezca más de una vez.',q:'¿Qué significa que una raíz de un polinomio tenga "multiplicidad 2"?',opts:['Que la raíz vale 2','Que el factor correspondiente a esa raíz se repite dos veces en la factorización','Que hay dos raíces distintas','Que el polinomio tiene grado 2'],ans:1},
+{mod:'m2',hint:'💡 La pendiente se calcula como la diferencia de las "y" sobre la diferencia de las "x" entre dos puntos.',q:'¿Cuál es la pendiente de la recta que pasa por los puntos (1,2) y (3,8)?',opts:['3','6','2','4'],ans:0},
+{mod:'m2',hint:'💡 Reemplazá x por 0 en la ecuación y fijate qué valor de y te queda.',q:'¿Cuál es la ordenada al origen de la función y = -2x + 5?',opts:['5','-2','2','-5'],ans:0},
+{mod:'m2',hint:'💡 Igualá la expresión a cero y pensá qué número, elevado al cuadrado, da el término independiente.',q:'¿Cuáles son las raíces de la función y = x² - 4?',opts:['x=2 y x=-2','x=4 y x=-4','x=2 solamente','No tiene raíces reales'],ans:0},
+{mod:'m2',hint:'💡 En la forma canónica y=(x-h)²+k, el vértice se lee directamente de esos dos valores, con un cambio de signo en uno de ellos.',q:'¿Cuál es el vértice de la parábola y = (x-3)² + 1?',opts:['(3,1)','(-3,1)','(3,-1)','(1,3)'],ans:0},
+{mod:'m2',hint:'💡 El grado de un polinomio es el mayor exponente que aparece entre sus términos.',q:'¿Cuál es el grado del polinomio P(x) = 3x⁴ - 2x² + x - 7?',opts:['4','3','7','2'],ans:0},
+{mod:'m2',hint:'💡 El grado de un polinomio te da una pista sobre la cantidad máxima de raíces que puede tener.',q:'¿Cuántas raíces reales como máximo puede tener un polinomio de grado 3?',opts:['3','2','4','1'],ans:0},
+{mod:'m2',hint:'💡 Pensá qué pasa con el valor de "y" cuando la pendiente de una recta es exactamente 0.',q:'¿Qué tipo de función es y = 5 (una recta horizontal)?',opts:['Función constante','Función lineal creciente','Función cuadrática','Función decreciente'],ans:0},
+{mod:'m2',hint:'💡 Para sumar polinomios, agrupá y sumá los términos que tengan el mismo grado (términos semejantes).',q:'¿Cuál es el resultado de sumar los polinomios (2x²+3x) y (x²-x+4)?',opts:['3x²+2x+4','3x²+4x+4','2x²+2x+4','3x²+3x+4'],ans:0},
+{mod:'m2',hint:'💡 Pensá qué información previa te da ese valor antes de aplicar toda la fórmula resolvente.',q:'¿Qué representa el discriminante (b²-4ac) en una función cuadrática?',opts:['Indica cuántas raíces reales tiene la función','Indica el vértice de la parábola','Indica la pendiente de la recta tangente','Indica la ordenada al origen'],ans:0},
+{mod:'m2',hint:'💡 La fórmula resolvente incluye una raíz cuadrada. Pensá qué pasa si lo que está adentro de esa raíz es negativo.',q:'Si el discriminante de una función cuadrática es negativo, ¿qué ocurre con sus raíces?',opts:['No tiene raíces reales','Tiene una única raíz real','Tiene dos raíces reales distintas','Tiene infinitas raíces'],ans:0},
+{mod:'m2',hint:'💡 Es una diferencia de cuadrados. Pensá qué dos números, con signos opuestos, multiplicados entre sí dan ese resultado.',q:'¿Cuál es la forma factorizada de x² - 9?',opts:['(x-3)(x+3)','(x-9)(x+1)','(x-3)²','(x+9)(x-1)'],ans:0},
+{mod:'m2',hint:'💡 Una raíz es el valor de x que hace que el polinomio dé cero. ¿Qué valor cumple eso acá?',q:'¿Cuál es la raíz del polinomio P(x)=x-5 según el Teorema del Resto?',opts:['x=5','x=-5','x=0','x=1'],ans:0},
+{mod:'m2',hint:'💡 Pensá gráficamente: si dos rectas se cruzan en un solo lugar, ¿cuántas soluciones comparten?',q:'¿Qué tipo de sistema de ecuaciones lineales tiene una única solución?',opts:['Un sistema cuyas rectas se cortan en un solo punto','Un sistema cuyas rectas son paralelas','Un sistema cuyas rectas son coincidentes','Un sistema sin ecuaciones'],ans:0},
+{mod:'m2',hint:'💡 Pensá en dos rectas que nunca se tocan. ¿Cuántos puntos en común comparten?',q:'¿Qué significa que un sistema de dos ecuaciones lineales sea "incompatible"?',opts:['Que no tiene solución (las rectas son paralelas)','Que tiene infinitas soluciones','Que tiene una única solución','Que las dos ecuaciones son iguales'],ans:0},
+// ── m3: GEOMETRÍA Y MAGNITUDES (TRIGONOMETRÍA) (20) ───────────────
+{mod:'m3',hint:'💡 En un triángulo rectángulo, cada razón trigonométrica relaciona dos de sus tres lados respecto de un ángulo. Pensá cuáles corresponden acá.',q:'En un triángulo rectángulo, ¿cómo se calcula el seno de un ángulo agudo?',opts:['Cateto opuesto sobre hipotenusa','Cateto adyacente sobre hipotenusa','Cateto opuesto sobre cateto adyacente','Hipotenusa sobre cateto opuesto'],ans:0},
+{mod:'m3',hint:'💡 Pensá cuál de los catetos "toca" al ángulo que estás considerando, y con qué lado se relaciona acá.',q:'En un triángulo rectángulo, ¿cómo se calcula el coseno de un ángulo agudo?',opts:['Cateto opuesto sobre hipotenusa','Cateto adyacente sobre hipotenusa','Cateto opuesto sobre cateto adyacente','Hipotenusa sobre cateto adyacente'],ans:1},
+{mod:'m3',hint:'💡 Esta razón combina los dos catetos entre sí. Pensá en qué orden.',q:'¿Cómo se calcula la tangente de un ángulo agudo en un triángulo rectángulo?',opts:['Cateto opuesto sobre hipotenusa','Cateto adyacente sobre hipotenusa','Cateto opuesto sobre cateto adyacente','Hipotenusa sobre cateto opuesto'],ans:2},
+{mod:'m3',hint:'💡 Pensá en la relación entre los tres lados de un triángulo rectángulo, elevados al cuadrado.',q:'¿Qué establece el Teorema de Pitágoras?',opts:['La suma de los ángulos internos es 180°','En un triángulo rectángulo, la suma de los cuadrados de los catetos es igual al cuadrado de la hipotenusa','El área de un triángulo es base por altura sobre dos','Todos los triángulos son semejantes'],ans:1},
+{mod:'m3',hint:'💡 Pensá en dos triángulos con la misma forma pero distinto tamaño. ¿Qué se mantiene igual entre sus lados y ángulos?',q:'¿Cuándo dos triángulos son semejantes?',opts:['Cuando tienen exactamente el mismo tamaño','Cuando tienen sus ángulos correspondientes iguales y sus lados proporcionales','Cuando son ambos rectángulos','Cuando tienen la misma área'],ans:1},
+{mod:'m3',hint:'💡 Pensá en un triángulo que no tiene ningún ángulo de 90°. ¿Qué herramienta usarías para relacionar sus lados y ángulos?',q:'¿Para qué se usa el Teorema del Seno?',opts:['Solo para triángulos rectángulos','Para resolver triángulos oblicuángulos (no rectángulos), relacionando lados y ángulos opuestos','Para calcular áreas de círculos','Para sumar ángulos internos'],ans:1},
+{mod:'m3',hint:'💡 Pensá en una fórmula parecida al Teorema de Pitágoras, pero que también funciona cuando el triángulo no es rectángulo.',q:'¿Qué relación generaliza el Teorema del Coseno?',opts:['El Teorema de Pitágoras, aplicándolo a cualquier triángulo (no solo rectángulos)','La suma de ángulos internos','El área de un triángulo','La semejanza de triángulos'],ans:0},
+{mod:'m3',hint:'💡 Pensá en la suma de los tres ángulos internos de cualquier triángulo, sea cual sea su forma.',q:'¿Cuánto suman los ángulos internos de cualquier triángulo?',opts:['90°','180°','270°','360°'],ans:1},
+{mod:'m3',hint:'💡 Pensá en cuál de los tres lados de un triángulo rectángulo queda "enfrente" del ángulo de 90°.',q:'En un triángulo rectángulo, ¿qué es la hipotenusa?',opts:['El lado más corto','El lado opuesto al ángulo recto, siempre el más largo','Uno de los catetos','La altura del triángulo'],ans:1},
+{mod:'m3',hint:'💡 Pensá en el ángulo que forman dos líneas perfectamente perpendiculares entre sí.',q:'¿Cómo se llama un ángulo de exactamente 90°?',opts:['Agudo','Obtuso','Recto','Llano'],ans:2},
+{mod:'m3',hint:'💡 Aplicá la relación entre los tres lados de un triángulo rectángulo y sacá la raíz cuadrada al final.',q:'Si un cateto mide 6 y el otro 8, ¿cuánto mide la hipotenusa?',opts:['10','14','12','48'],ans:0},
+{mod:'m3',hint:'💡 Este es uno de los ángulos "notables" de la trigonometría, con un valor exacto muy usado que conviene memorizar.',q:'¿Cuál es el valor aproximado de sen(30°)?',opts:['0,5','1','0','0,87'],ans:0},
+{mod:'m3',hint:'💡 Pensá en un triángulo donde el ángulo es tan chico que casi no existe. ¿Qué pasa con el cateto adyacente respecto de la hipotenusa?',q:'¿Cuál es el valor de cos(0°)?',opts:['1','0','0,5','-1'],ans:0},
+{mod:'m3',hint:'💡 Pensá que el triángulo rectángulo ya tiene un ángulo de 90°. ¿Cuánto les queda a los otros dos para completar 180°?',q:'¿Qué relación existe entre los ángulos agudos de un triángulo rectángulo?',opts:['Suman 90°','Suman 180°','Son siempre iguales entre sí','Suman 45°'],ans:0},
+{mod:'m3',hint:'💡 Pensá en el nombre que reciben los dos lados que forman el ángulo recto.',q:'¿Cómo se llama el lado de un triángulo rectángulo que NO es la hipotenusa?',opts:['Cateto','Vértice','Bisectriz','Mediana'],ans:0},
+{mod:'m3',hint:'💡 Pensá en la diferencia entre "tener la misma forma" y "ser exactamente igual" en tamaño y forma.',q:'Si dos triángulos son congruentes, ¿qué se puede afirmar sobre ellos?',opts:['Tienen exactamente la misma forma y el mismo tamaño','Tienen la misma forma pero distinto tamaño','Solo comparten un ángulo igual','No tienen ninguna relación'],ans:0},
+{mod:'m3',hint:'💡 Pensá en otra forma de medir ángulos, muy usada en matemática avanzada, relacionada con la longitud de un arco de circunferencia.',q:'¿Qué unidad se usa habitualmente para medir ángulos en trigonometría, además del grado?',opts:['Radián','Metro','Litro','Kilogramo'],ans:0},
+{mod:'m3',hint:'💡 Pensá en la relación clásica entre grados y esta otra unidad angular, la misma que aparece en la fórmula de la circunferencia.',q:'¿Cuántos radianes equivalen a 180°?',opts:['π','2π','π/2','360'],ans:0},
+{mod:'m3',hint:'💡 Pensá en el prefijo "isós", que en griego significa "igual". ¿A qué elementos del triángulo se refiere?',q:'En un triángulo isósceles, ¿qué característica tienen dos de sus lados?',opts:['Son iguales entre sí','Son siempre perpendiculares','Suman 180°','Son proporcionales a 3 y 4'],ans:0},
+{mod:'m3',hint:'💡 Pensá en el triángulo que no tiene ningún par de lados iguales entre sí.',q:'¿Qué tipo de triángulo tiene sus tres lados de distinta medida?',opts:['Escaleno','Equilátero','Isósceles','Rectángulo'],ans:0},
+// ── m4: PROBABILIDAD Y ESTADÍSTICA (18) ───────────────────────────
+{mod:'m4',hint:'💡 Pensá en dos sucesos que, si pasa uno, automáticamente hacen que el otro sea imposible.',q:'¿Qué significa que dos sucesos sean "mutuamente excluyentes"?',opts:['Que ambos pueden ocurrir juntos','Que no pueden ocurrir al mismo tiempo','Que tienen la misma probabilidad','Que son sucesos independientes'],ans:1},
+{mod:'m4',hint:'💡 Pensá en dos sucesos donde enterarte del resultado de uno no te da ninguna pista sobre el otro.',q:'¿Qué significa que dos sucesos sean "independientes"?',opts:['Que no pueden ocurrir nunca juntos','Que la ocurrencia de uno no afecta la probabilidad del otro','Que tienen probabilidad 0','Que siempre ocurren juntos'],ans:1},
+{mod:'m4',hint:'💡 Pensá en cómo cambia la probabilidad de algo cuando ya sabés que otra cosa relacionada ya ocurrió.',q:'¿Qué es la probabilidad condicional?',opts:['La probabilidad de un suceso imposible','La probabilidad de que ocurra un suceso, dado que otro ya ocurrió','La probabilidad de dos sucesos mutuamente excluyentes','La suma de todas las probabilidades posibles'],ans:1},
+{mod:'m4',hint:'💡 Pensá qué operación matemática combinás entre dos probabilidades cuando ambos sucesos son independientes entre sí.',q:'¿Cómo se calcula la probabilidad de que ocurran dos sucesos independientes a la vez?',opts:['Sumando sus probabilidades','Multiplicando sus probabilidades individuales','Restando sus probabilidades','Dividiendo una probabilidad por la otra'],ans:1},
+{mod:'m4',hint:'💡 Pensá en qué tan "esparcidos" o "juntos" están los datos alrededor de un valor central.',q:'¿Qué mide la varianza en estadística?',opts:['El valor máximo de un conjunto de datos','Qué tan dispersos están los datos respecto de la media','La cantidad total de datos','El valor que más se repite'],ans:1},
+{mod:'m4',hint:'💡 Pensá qué operación matemática relaciona a esta medida con la varianza, para volver a la unidad original de los datos.',q:'¿Cómo se relaciona el desvío estándar con la varianza?',opts:['Son exactamente lo mismo','El desvío estándar es la raíz cuadrada de la varianza','La varianza es la raíz cuadrada del desvío estándar','No tienen ninguna relación'],ans:1},
+{mod:'m4',hint:'💡 Pensá en los dos casos extremos: un suceso que nunca pasa, y uno que siempre pasa. ¿Qué valores representan eso?',q:'¿Entre qué valores se encuentra siempre la probabilidad de un suceso?',opts:['Entre -1 y 1','Entre 0 y 1','Entre 0 y 100','Entre 1 y 10'],ans:1},
+{mod:'m4',hint:'💡 Pensá en el procedimiento típico para calcular un "promedio" de varios valores.',q:'¿Cómo se calcula la media aritmética de un conjunto de datos?',opts:['Se toma el valor del medio','Se suman todos los valores y se dividen por la cantidad de datos','Se resta el mayor menos el menor','Se multiplican todos los valores'],ans:1},
+{mod:'m4',hint:'💡 Pensá en una fracción que compara lo que buscás con todo lo que podría pasar.',q:'¿Cómo se calcula la probabilidad clásica de un suceso?',opts:['Casos posibles sobre casos favorables','Casos favorables sobre casos posibles','Casos favorables más casos posibles','Casos posibles menos casos favorables'],ans:1},
+{mod:'m4',hint:'💡 Contá cuántos resultados posibles hay en total, y cuántos de esos cumplen la condición pedida.',q:'Si tirás un dado común, ¿cuál es la probabilidad de obtener un número par?',opts:['1/2','1/3','1/6','2/3'],ans:0},
+{mod:'m4',hint:'💡 Pensá cuántos resultados posibles tiene una moneda, y cuántos de ellos corresponden al que te preguntan.',q:'¿Cuál es la probabilidad de que salga "cara" al tirar una moneda equilibrada?',opts:['1/2','1','0','1/4'],ans:0},
+{mod:'m4',hint:'💡 Pensá en ordenar todos los datos de menor a mayor. ¿Qué valor queda justo en el centro de esa lista?',q:'¿Qué representa la mediana de un conjunto de datos?',opts:['El valor que queda en el medio al ordenar los datos','El valor que más se repite','La suma de todos los valores','La diferencia entre el mayor y el menor valor'],ans:0},
+{mod:'m4',hint:'💡 Pensá en el dato que aparece con mayor frecuencia dentro del conjunto.',q:'¿Qué representa la moda de un conjunto de datos?',opts:['El valor que más veces se repite','El valor del medio','El promedio de todos los valores','La diferencia entre el mayor y menor dato'],ans:0},
+{mod:'m4',hint:'💡 Pensá en cuánto "se estira" el conjunto de datos, desde el más chico hasta el más grande.',q:'¿Qué es el rango de un conjunto de datos?',opts:['La diferencia entre el valor máximo y el mínimo','El promedio de los datos','El valor que más se repite','La raíz cuadrada de la varianza'],ans:0},
+{mod:'m4',hint:'💡 Pensá en dos sucesos donde, si no ocurre uno, necesariamente ocurre el otro. Entre los dos cubren todos los casos.',q:'Si dos sucesos son complementarios, ¿qué se cumple sobre sus probabilidades?',opts:['Suman 1','Suman 0','Son siempre iguales','Su producto es 1'],ans:0},
+{mod:'m4',hint:'💡 Pensá en un gráfico de barras contiguas, pensado especialmente para datos numéricos agrupados en intervalos.',q:'¿Qué tipo de gráfico es útil para representar la distribución de frecuencias de datos agrupados en intervalos?',opts:['Histograma','Diagrama de dispersión','Gráfico circular','Diagrama de Venn'],ans:0},
+{mod:'m4',hint:'💡 Pensá en esos círculos que se superponen para mostrar qué elementos tienen en común dos o más conjuntos.',q:'¿Para qué se usa un diagrama de Venn en probabilidad?',opts:['Para representar visualmente la relación entre distintos sucesos','Para calcular la media aritmética','Para ordenar datos de mayor a menor','Para graficar una función lineal'],ans:0},
+{mod:'m4',hint:'💡 Pensá en comparar cuántas veces aparece un dato respecto del total de datos, expresado como fracción o porcentaje.',q:'En una tabla de frecuencias, ¿qué indica la frecuencia relativa de un dato?',opts:['La proporción (o porcentaje) que representa ese dato sobre el total','La cantidad exacta de veces que aparece ese dato','El valor máximo de la tabla','La suma de todas las frecuencias'],ans:0},
 ];
+
 </script>
 
 <!-- [004b] GUÍAS POR EJE — explicación breve + ejercicios de ejemplo -->
@@ -804,10 +917,13 @@ function doStartTeam(){
     nombre=document.getElementById('eq-nombre').value.trim();
     integrantes=document.getElementById('eq-integrantes').value.split('\n').map(s=>s.trim()).filter(Boolean);
     if(!nombre){showAuthMsg('Poné el nombre del equipo.','error');return;}
-    if(!integrantes.length){showAuthMsg('Escribí al menos un integrante (nombre y apellido).','error');return;}
+    if(!integrantes.length){showAuthMsg('Escribí al menos un apodo de integrante.','error');return;}
+    const largo=integrantes.find(i=>i.length>8);
+    if(largo){showAuthMsg(`"${largo}" tiene más de 8 caracteres. Usá un apodo más corto.`,'error');return;}
   }else{
     nombre=document.getElementById('ind-nombre').value.trim();
-    if(!nombre){showAuthMsg('Poné tu nombre y apellido.','error');return;}
+    if(!nombre){showAuthMsg('Poné tu apodo.','error');return;}
+    if(nombre.length>8){showAuthMsg('El apodo no puede tener más de 8 caracteres.','error');return;}
     integrantes=[nombre];
   }
   currentUser={nombre,integrantes,mail:slug(nombre)+'@mundialmate.nticx'};
@@ -1207,6 +1323,7 @@ function selectAnswer(selectedIdx,correctIdx){
   const isCorrect=selectedIdx===correctIdx;
   opts[selectedIdx].classList.add(isCorrect?'correct':'wrong');
   if(!isCorrect)opts[correctIdx].classList.add('correct');
+  showAnswerFlash(isCorrect);
   const q=quizState.questions[quizState.idx];
   quizState.answers.push(isCorrect);
   quizState.byMod[q.mod].total++;
@@ -1483,19 +1600,142 @@ async function loadDocente(){
     const usuarios=(data.usuarios||[]).slice(1);
     const totalIntentos=puntajes.length;
     const avgPts=totalIntentos?Math.round(puntajes.reduce((s,r)=>s+Number(r[3]),0)/totalIntentos*10)/10:0;
+
+    // ── Agrupar por jugador/equipo (aciertos y errores por intento y por eje) ──
+    const defs=temaDefs();
+    const porAlumno={};
+    puntajes.forEach(r=>{
+      const mail=r[0],nombre=r[1],eje=r[2],aciertos=Number(r[3])||0,total=Number(r[4])||10,fecha=r[5]||'';
+      const errores=Math.max(total-aciertos,0);
+      if(!porAlumno[mail])porAlumno[mail]={nombre,mail,intentos:[],mejorPorEje:{}};
+      porAlumno[mail].intentos.push({eje,aciertos,errores,total,fecha,pct:Math.round(aciertos/total*100)});
+      if(!porAlumno[mail].mejorPorEje[eje]||aciertos>porAlumno[mail].mejorPorEje[eje].aciertos){
+        porAlumno[mail].mejorPorEje[eje]={aciertos,total,errores};
+      }
+    });
+    const alumnos=Object.values(porAlumno);
+    const sumAciertosGlobal=alumnos.reduce((s,a)=>s+Object.values(a.mejorPorEje).reduce((s2,v)=>s2+v.aciertos,0),0);
+    const sumTotalGlobal=alumnos.reduce((s,a)=>s+Object.values(a.mejorPorEje).reduce((s2,v)=>s2+v.total,0),0);
+    const pctGlobal=sumTotalGlobal?Math.round(sumAciertosGlobal/sumTotalGlobal*100):0;
+
+    function celda(v){
+      if(!v)return`<td style="text-align:center;padding:.4rem .3rem;font-size:.85rem;color:var(--muted)">—</td>`;
+      const pct=Math.round(v.aciertos/v.total*100);
+      const emoji=pct>=80?'🟢':pct>=60?'🟡':'🔴';
+      const c=pct>=80?'#4ade80':pct>=60?'#ffab2e':'#ff5a7a';
+      return`<td style="text-align:center;padding:.4rem .3rem">
+        <div style="font-size:1rem">${emoji}</div>
+        <div style="font-family:var(--fh);font-size:.68rem;font-weight:800;color:${c}">${v.aciertos}✔ / ${v.errores}✘</div>
+      </td>`;
+    }
+
+    const matrizHtml=`
+      <div style="overflow-x:auto;margin-bottom:1.25rem">
+        <table style="border-collapse:collapse;width:100%;min-width:560px">
+          <thead>
+            <tr>
+              <th style="text-align:left;padding:.5rem .75rem;font-family:var(--fh);font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;border-bottom:1px solid var(--border)">Jugador/Equipo</th>
+              ${defs.map(d=>`<th style="text-align:center;padding:.5rem .4rem;font-family:var(--fh);font-size:.68rem;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border)">${d.icon}<br>${d.label}</th>`).join('')}
+              <th style="text-align:center;padding:.5rem .4rem;font-family:var(--fh);font-size:.68rem;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border)">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${alumnos.map(a=>{
+              const totalAc=Object.values(a.mejorPorEje).reduce((s,v)=>s+v.aciertos,0);
+              const totalEr=Object.values(a.mejorPorEje).reduce((s,v)=>s+v.errores,0);
+              const totalPos=totalAc+totalEr;
+              const pct=totalPos?Math.round(totalAc/totalPos*100):null;
+              const pctC=pct!=null?(pct>=80?'#4ade80':pct>=60?'#ffab2e':'#ff5a7a'):'var(--muted)';
+              return`<tr style="border-bottom:1px solid var(--border)">
+                <td style="padding:.5rem .75rem;white-space:nowrap">
+                  <div style="font-family:var(--fh);font-weight:800;font-size:.85rem">${a.nombre}</div>
+                  <div style="font-size:.66rem;color:var(--muted)">${Object.keys(a.mejorPorEje).length}/${defs.length} jugados</div>
+                </td>
+                ${defs.map(d=>celda(a.mejorPorEje[d.id])).join('')}
+                <td style="text-align:center;padding:.4rem .3rem">
+                  ${pct!=null?`<div style="font-family:var(--fh);font-weight:800;font-size:.82rem;color:${pctC}">${totalAc}✔/${totalEr}✘</div><div style="font-size:.62rem;color:var(--muted)">${pct}%</div>`:'<span style="color:var(--muted)">—</span>'}
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div style="display:flex;gap:1rem;margin-bottom:1.5rem;font-size:.76rem;color:var(--muted);flex-wrap:wrap">
+        <span>🟢 ≥80% de aciertos</span>
+        <span>🟡 60-79%</span>
+        <span>🔴 &lt;60%</span>
+        <span>— Sin jugar</span>
+      </div>`;
+
+    // ── Detalle expandible por jugador (historial completo de aciertos/errores) ──
+    const detalleHtml=alumnos.map((a,idx)=>{
+      const totalAc=Object.values(a.mejorPorEje).reduce((s,v)=>s+v.aciertos,0);
+      const totalEr=Object.values(a.mejorPorEje).reduce((s,v)=>s+v.errores,0);
+      const histHtml=a.intentos.map(i=>{
+        const def=defs.find(d=>d.id===i.eje);
+        const c=i.pct>=80?'#4ade80':i.pct>=60?'#ffab2e':'#ff5a7a';
+        return`<tr style="font-size:.78rem">
+          <td style="padding:.3rem .6rem;color:var(--muted)">${def?def.icon+' '+def.label:i.eje}</td>
+          <td style="padding:.3rem .6rem;font-family:var(--fh);font-weight:800;color:#4ade80">${i.aciertos}✔</td>
+          <td style="padding:.3rem .6rem;font-family:var(--fh);font-weight:800;color:#ff5a7a">${i.errores}✘</td>
+          <td style="padding:.3rem .6rem;color:${c}">${i.pct}%</td>
+          <td style="padding:.3rem .6rem;color:var(--muted)">${i.fecha}</td>
+        </tr>`;
+      }).join('');
+      return`
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;margin-bottom:.7rem;overflow:hidden">
+          <div style="display:flex;align-items:center;gap:1rem;padding:.8rem 1rem;cursor:pointer" onclick="toggleAlumnoMate('alm${idx}')">
+            <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--c1),var(--c2));display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:800;font-size:.85rem;color:#0a1128;flex-shrink:0">${a.nombre.charAt(0).toUpperCase()}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-family:var(--fh);font-weight:800;font-size:.88rem">${a.nombre}</div>
+              <div style="font-size:.68rem;color:var(--muted)">${a.mail}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-family:var(--fh);font-weight:800;font-size:.9rem"><span style="color:#4ade80">${totalAc}✔</span> / <span style="color:#ff5a7a">${totalEr}✘</span></div>
+              <div style="font-size:.66rem;color:var(--muted)">${a.intentos.length} partido${a.intentos.length!==1?'s':''}</div>
+            </div>
+            <div style="color:var(--muted);font-size:.8rem;flex-shrink:0" id="arrM${idx}">▼</div>
+          </div>
+          <div id="almM${idx}" style="display:none;border-top:1px solid var(--border);padding:.7rem 1rem">
+            <table style="width:100%;border-collapse:collapse">
+              <thead><tr style="font-size:.68rem;color:var(--muted)">
+                <th style="text-align:left;padding:.3rem .6rem;font-family:var(--fh)">Eje</th>
+                <th style="text-align:left;padding:.3rem .6rem;font-family:var(--fh)">Aciertos</th>
+                <th style="text-align:left;padding:.3rem .6rem;font-family:var(--fh)">Errores</th>
+                <th style="text-align:left;padding:.3rem .6rem;font-family:var(--fh)">%</th>
+                <th style="text-align:left;padding:.3rem .6rem;font-family:var(--fh)">Fecha</th>
+              </tr></thead>
+              <tbody>${histHtml}</tbody>
+            </table>
+          </div>
+        </div>`;
+    }).join('');
+
     el.innerHTML=`
       <div class="doc-stat-row">
         <div class="doc-stat"><strong>${usuarios.length}</strong><span>Registrados</span></div>
         <div class="doc-stat"><strong>${totalIntentos}</strong><span>Partidos jugados</span></div>
         <div class="doc-stat"><strong>${avgPts}</strong><span>Prom. pts</span></div>
+        <div class="doc-stat"><strong>${pctGlobal}%</strong><span>Aciertos globales</span></div>
       </div>
-      <div class="doc-table-wrap">
-        <table class="doc-table">
-          <thead><tr><th>Equipo/Nombre</th><th>Eje</th><th>Puntaje</th><th>Fecha</th></tr></thead>
-          <tbody>${puntajes.map(r=>`<tr><td><strong>${r[1]}</strong></td><td>${r[2]}</td><td>${r[3]}/${r[4]}</td><td>${r[5]||'—'}</td></tr>`).join('')}</tbody>
-        </table>
-      </div>`;
+      <div style="font-family:var(--fh);font-size:.76rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.7rem">
+        🗺️ Mapa de aciertos/errores por eje
+      </div>
+      ${matrizHtml}
+      <div style="font-family:var(--fh);font-size:.76rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.7rem">
+        📋 Detalle por jugador <span style="font-weight:400;text-transform:none;font-family:var(--fb)">— click para ver historial completo</span>
+      </div>
+      ${detalleHtml||'<div class="ranking-empty">📭 Todavía no hay partidos registrados.</div>'}
+    `;
   }catch(e){el.innerHTML='<div class="ranking-empty">⚠️ Error al cargar datos.</div>';}
+}
+function toggleAlumnoMate(id){
+  const el=document.getElementById(id);
+  const idx=id.replace('alm','');
+  const arr=document.getElementById('arrM'+idx);
+  const open=el.style.display==='none';
+  el.style.display=open?'block':'none';
+  if(arr)arr.textContent=open?'▲':'▼';
 }
 
 // [011b] PANEL DOCENTE — CONTENIDO (ejes activos + agregar preguntas)
@@ -2063,6 +2303,36 @@ function stopChatTickerCarousel(){clearInterval(chatTickerCarouselTimer);}
 function startChatBadgePolling(){setInterval(loadChat,20000);}
 
 // [012] PRINT / PDF
+// ── Refuerzo visual por cada respuesta (no solo al final del partido) ──
+function showAnswerFlash(isCorrect){
+  const el=document.createElement('div');
+  el.className='answer-flash';
+  el.textContent=isCorrect?'✅':'❌';
+  el.style.color=isCorrect?'#4ade80':'#ff5a7a';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),800);
+  const card=document.querySelector('.q-card');
+  if(card){
+    const cls=isCorrect?'pulse-ok':'pulse-ko';
+    card.classList.add(cls);
+    setTimeout(()=>card.classList.remove(cls),650);
+  }
+  if(isCorrect)launchMiniConfetti();
+}
+function launchMiniConfetti(){
+  const c=document.getElementById('confetti-container');
+  const cols=['#6cace4','#ffd54a','#4ade80','#ffab2e'];
+  const pieces=[];
+  for(let i=0;i<16;i++){
+    const el=document.createElement('div');el.className='confetti-piece';
+    const s=Math.random()*8+4;
+    el.style.cssText=`left:${38+Math.random()*24}%;top:33%;background:${cols[Math.floor(Math.random()*cols.length)]};width:${s}px;height:${s}px;animation-delay:${Math.random()*.15}s;animation-duration:${Math.random()*.9+1.1}s;border-radius:${Math.random()>.5?'50%':'2px'};`;
+    c.appendChild(el);
+    pieces.push(el);
+  }
+  setTimeout(()=>{pieces.forEach(p=>p.remove());},1600);
+}
+
 function launchConfetti(pct){
   const c=document.getElementById('confetti-container');
   const cols=['#6cace4','#ffd54a','#4ade80','#ffab2e','#ff5a7a','#fff','#ffd700'];
@@ -2129,6 +2399,17 @@ function showScreen(id){
 }
 function goHome(){clearInterval(quizTimerInterval);stopHeartbeat();stopMiniRank();stopChatTicker();showChatFab(false);stopMusic();renderHome();showScreen('home');}
 
+const LS_TUTORIAL_VISTO='mundialmate_tutorial_visto';
+function closeTutorial(){
+  document.getElementById('tutorial-overlay').classList.remove('open');
+  try{localStorage.setItem(LS_TUTORIAL_VISTO,'1');}catch(e){}
+}
+function maybeShowTutorial(){
+  let visto=false;
+  try{visto=localStorage.getItem(LS_TUTORIAL_VISTO)==='1';}catch(e){}
+  if(!visto)document.getElementById('tutorial-overlay').classList.add('open');
+}
+
 loadSavedUser();
 renderHome();
 renderChatEmojiGrid();
@@ -2138,6 +2419,7 @@ makeFabDraggable(document.getElementById('fab-logros'),()=>toggleLogrosPanel());
 makeFabDraggable(document.getElementById('fab-chat'),()=>toggleChatPanel());
 loadChat();
 startChatBadgePolling();
+maybeShowTutorial();
 </script>
 </body>
 </html>
